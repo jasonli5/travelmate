@@ -1,0 +1,25 @@
+*{
+    --bckgrnd: #fff5eb;
+    --main-color: #95d0f7;
+    --dark: #010101;
+    --accent: #fc79a8;
+}
+.coiny-regular {
+    font-family: "Coiny", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+.navbar {
+    background-color: var(--bckgrnd);
+    height:80px;
+}
+body{
+    background-color: var(--main-color);
+}
+#main-form{
+    border: 2px solid var(--dark);
+    background-color: var(--bckgrnd)
+}
+.ms-footer {
+    background-color: var(--dark);
+}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{%block content%}
+<div class="p-5">
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col mx-auto text-center mb-3">
+              <h2 class='coiny-regular'>TravelMate: Your <em>destination</em> for intutitive vacation planning!</h2>
+            </div>
+          </div>
+    </div>
+    <div class="row m-3">
+        <div class="col-5 px-3 mx-auto text-center my-auto" >
+            <div class="card" id="main-form">
+                <div class="card-body">
+                    <h4 class="card-title coiny-regular">Enter your trip details</h4>
+                    <h6 class="card-sutitle">TravelMate uses API integrations to give you accurate weather, packing, and activites</h6>
+                    <br/>
+                    <form action="" method="GET">
+                        <p>
+                            <label for="destination">Destination: </label>
+                            <input id="destination" type="text" name="destination" value="{{destination}}">
+                        </p>
+                        <p>
+                            <label for"trip-dates"> Start/End Date(s) of Trip: </label>
+                            <input id="trip-dates" type="date" name="start-date" value="{{start_date}}"> -
+                            <input id="trip-dates" type="date" name="end-date" value="{{end_date}}">
+                        </p>
+                        <p>
+                            <label for="activities"> Planned Activities: </label><br/>
+                            <textarea id="activities" name="activities"  rows="6" cols="30" value="{{activities}}">Enter your activities, separated by commas</textarea>
+                        </p>
+                        <input type="submit" value="Plan My Trip!">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-1 px-1 mx-auto text-center my-auto">
+            <h1 class="coiny-regular"> OR </h1>
+        </div>
+        <div class="col-5 px-3 mx-auto text-center my-auto">
+            <div class="card" id="main-form">
+                <div class="card-body">
+                    <h4 class="card-title coiny-regular">Log In</h4>
+                    <h6 class="card-sutitle">Returning users can access their saved trips</h6>
+                    <br/>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <p>
+                            <label for="username">Username</label>
+                            <input id="username" type="text" name = "username" aria-required="true" required autocomplete="username" class="form-control">
+                        </p>
+                        <p>
+                            <label for="email">Email</label>
+                            <input id="email" type="text" name = "email" aria-required="true" required autocomplete="email" class="form-control">
+                        </p>
+                        <p>
+                            <label for="password">Password</label>
+                            <input id="password" type="password" name="password" aria-required="true" autocomplete="current-password" class="form-control">
+                        </p>
+                        <input type="submit" value="Log In">
+                        <div>
+                            <a href="#"><i>Forgot Password?</i></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>           
+    </div>
+</div>
+{%endblock content%}
