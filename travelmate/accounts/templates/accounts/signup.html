@@ -1,0 +1,48 @@
+{% extends 'base.html'%}
+{%block content%}
+<div class="p-3 mt-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="card shadow p-3 mb-4 rounded">
+                <div class="card-body">
+                    <h2 class="coiny-regular" id="form">Sign Up</h2>
+                    <form method="POST">
+                        {%csrf_token%}
+                        {% if template_data.form.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <div id="form_errors">
+                                    {% for key, value in template_data.form.errors.items %}
+                                        <strong>{{ value }}</strong>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="py-2 form-group">
+                            <label>Email</label>
+                            {{template_data.form.email}}
+                        </div>
+                        <div class="py-2 form-group">
+                            <label>Username</label>
+                            {{template_data.form.username}}
+                        </div>
+                        <div class="py-2 form-group">
+                            <label>Password</label>
+                            {{template_data.form.password1}}
+                        </div>
+                        <div class="py-2 form-group">
+                            <label>Confirm Password</label>
+                            {{template_data.form.password2}}
+                        </div>
+                        <button class="btn btn-primary" type="submit">Sign Up</button>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="small">
+                        <a href="#">Have an account? Go to Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock content%}

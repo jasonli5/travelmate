@@ -11,14 +11,13 @@
 }
 .navbar {
     background-color: var(--bckgrnd);
-    height:80px;
 }
 body{
     background-color: var(--main-color);
 }
-#main-form{
+#form{
     border: 2px solid var(--dark);
-    background-color: var(--bckgrnd)
+    background-color: var(--bckgrnd);
 }
 .ms-footer {
     background-color: var(--dark);
