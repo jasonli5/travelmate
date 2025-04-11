@@ -3,6 +3,9 @@ from . import views
 from django.contrib.auth import views as auth_views
 from accounts.views import CustomLoginView, ResetPasswordView
 from accounts.forms import LoginForm
+from django.contrib.auth import views as auth_views
+from accounts.views import CustomLoginView, ResetPasswordView
+from accounts.forms import LoginForm
 
 urlpatterns = [
     path('signup/', views.signup, name='accounts.signup'),
