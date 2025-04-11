@@ -1,0 +1,37 @@
+{%extends 'base.html'%}
+{%block content%}
+<div class="p-3 my-4">
+    <div class="container">
+        <div class="row justify-content-center my-3">
+            <div class="col-5">
+                <div class="card shadow p-3 mt-4 rounded" id="form">
+                    <div class="card-body">
+                        <h2 class="coiny-regular">Log In</h2>
+                        {% if template_data.error %}
+                            <div class="alert alert-danger" role="alert">
+                                {{template_data.error}}
+                            </div>
+                        {% endif %}
+                        <form method="POST">
+                            {%csrf_token%}
+                            <div class="py-2 form-group">
+                                <label>Username</label>
+                                {{form.username}}
+                            </div>
+                            <div class="py-2 form-group">
+                                <label>Password</label>
+                                {{form.password}}
+                            </div>
+                            <div class="py-2 form-group">
+                                <button class="my-2 btn btn-primary" type="submit">Log In</button>
+                            </div>
+                            <a href="{%url 'accounts.reset'%}">Forgot Password? Click here</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+{%endblock content%}

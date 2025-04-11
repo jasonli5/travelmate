@@ -1,0 +1,35 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block content%}
+<div class = "row my-4">
+    <div class="container">
+        <div class="row mb-4 justify-content-center">
+            <div class="col-5">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-2">
+                                <img src="{% static 'img/profile.png' %}" alt="logo" height="80px"/>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="coiny-regular"> {{user.username}}</h4>
+                            <h6> Member since 0/0/0000 </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col-4 mx-5">
+                <h3 class="coiny-regular"> Saved Trips</h3>
+                <p> trip cards go here </p>
+            </div>
+            <div class="col-4 mx-3">
+                <h3 class="coiny-regular"> Draft Trips</h3>
+                <p> trip cards go here </p>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock content%}
