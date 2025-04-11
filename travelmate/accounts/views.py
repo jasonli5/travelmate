@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views import View
 from django.contrib.auth import logout as auth_logout
 from .forms import RegisterForm, LoginForm
 from django.contrib.auth.decorators import login_required
@@ -6,20 +7,26 @@ from django.contrib.auth.views import LoginView, PasswordResetView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 
-def signup(request):
-    template_data={}
-    template_data['title'] = 'Sign Up'
-    if request.method == 'GET':
-        template_data['form'] = RegisterForm
-        return render(request, 'accounts/signup.html', {'template_data':template_data})
-    elif request.method == 'POST':
-        form = RegisterForm(request.POST)
+class RegisterView(View):
+    form_class = RegisterForm
+    initial = {'key': 'value'}
+    template_name = 'accounts/signup.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class(initial=self.initial)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            user.username = form.cleaned_data.get('username')
+            user.email = form.cleaned_data.get('email')
+            user.save()
             return redirect('accounts.login')
-        else:
-            template_data['form'] = form
-            return render(request,'accounts/signup.html', {'template_data':template_data})     
+
+        return render(request, self.template_name, {'form': form})
+
 class CustomLoginView(LoginView):
     form_class = LoginForm
     def form_valid(self, form):

@@ -8,10 +8,10 @@
                     <h2 class="coiny-regular">Sign Up</h2>
                     <form method="POST">
                         {%csrf_token%}
-                        {% if template_data.form.errors %}
+                        {% if form.errors %}
                             <div class="alert alert-danger" role="alert">
                                 <div id="form_errors">
-                                    {% for key, value in template_data.form.errors.items %}
+                                    {% for key, value in form.errors.items %}
                                         <strong>{{ value }}</strong>
                                     {% endfor %}
                                 </div>
@@ -19,19 +19,19 @@
                         {% endif %}
                         <div class="py-2 form-group">
                             <label>Email</label>
-                            {{template_data.form.email}}
+                            {{form.email}}
                         </div>
                         <div class="py-2 form-group">
                             <label>Username</label>
-                            {{template_data.form.username}}
+                            {{form.username}}
                         </div>
                         <div class="py-2 form-group">
                             <label>Password</label>
-                            {{template_data.form.password1}}
+                            {{form.password1}}
                         </div>
                         <div class="py-2 form-group">
                             <label>Confirm Password</label>
-                            {{template_data.form.password2}}
+                            {{form.password2}}
                         </div>
                         <button class="my-4 btn btn-primary" type="submit">Sign Up</button>
                     </form>

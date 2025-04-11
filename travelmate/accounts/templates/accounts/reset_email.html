@@ -1,16 +1,18 @@
 {%load static%}
 {% autoescape off %}
-  Thank you for choosing TravelMate for your vacation planning needs!
+
+Hello, User {{ user.username }}
+
+Thank you for choosing TravelMate for your vacation planning needs!
     
-  To initiate the password reset process for your {{ user.username }}TravelMate Account,
-  click the link below:
+To initiate the password reset process for your TravelMate Account,
+click the link below:
 
-  {{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
 
-  If clicking the link above doesn't work, please copy and paste the URL in a new browser
-  window instead.
+If clicking the link above doesn't work, please copy and paste the URL in a new browser
+window instead.
 
-  Sincerely,
-  TravelaMate Team
-  {%static 'img/logo3.png'%}
+Sincerely,
+TravelMate Team
 {% endautoescape %}
