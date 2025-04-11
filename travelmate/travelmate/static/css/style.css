@@ -22,6 +22,3 @@ body{
 .ms-footer {
     background-color: var(--dark);
 }
-p {
-    font-weight: bold;
-}

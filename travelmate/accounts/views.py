@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
+from django.contrib.auth import logout as auth_logout
 from .forms import RegisterForm, LoginForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, PasswordResetView
@@ -30,8 +29,8 @@ class CustomLoginView(LoginView):
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = 'accounts/password_reset.html'
-    email_template_name = 'accounts/password_reset_email.html'
-    subject_template_name = 'accounts/password_reset_subject'
+    email_template_name = 'accounts/reset_email.html'
+    subject_template_name = 'accounts/email_subject.txt'
     success_message = "We've emailed you instructions for setting your password, " \
                       "if an account exists with the email you entered. You should receive them shortly." \
                       " If you don't receive an email, " \
