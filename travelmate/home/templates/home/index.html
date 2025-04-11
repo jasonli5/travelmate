@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{%load static%}
 {%block content%}
 <div class="p-5">
     <div class="container">
@@ -10,9 +11,9 @@
     </div>
     <div class="row m-3">
         <div class="col-5 px-3 mx-auto text-center my-auto" >
-            <div class="card" id="form">
+            <div class="card w-100" id="form">
                 <div class="card-body">
-                    <h4 class="card-title coiny-regular">Enter your trip details</h4>
+                    <h3 class="card-title coiny-regular">Enter your trip details</h3>
                     <h6 class="card-sutitle">TravelMate uses API integrations to give you accurate weather, packing, and activites</h6>
                     <br/>
                     <form action="" method="GET">
@@ -27,19 +28,13 @@
                         </p>
                         <p>
                             <label for="activities"> Planned Activities: </label><br/>
-                            <textarea id="activities" name="activities"  rows="6" cols="30" value="{{activities}}">Enter your activities, separated by commas</textarea>
+                            <textarea id="activities" name="activities"  rows="6" value="{{activities}}">Enter your activities, separated by commas</textarea>
                         </p>
                         <input type="submit" value="Plan My Trip!">
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="col-1 px-1 mx-auto text-center my-auto">
-            <h1 class="coiny-regular"> OR </h1>
-        </div>
-        <div class="col-5 px-3 mx-auto text-center my-auto">
-            
-        </div>           
+        </div>        
     </div>
 </div>
 {%endblock content%}
