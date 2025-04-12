@@ -1,0 +1,24 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block content%}
+<div class="p-3 mt-4">
+    <div class="container">
+        {%for trip in template_data.trips%}
+            <div class="col-4 my-2">
+                <div class="card py-3 my-auto">
+                    <div class="card-body">
+                        <div class="col-2">
+                            <img src="{%static 'img/plane.png'%}" alt="plane illustration"/>
+                        </div>
+                        <div class="col-5">
+                            <h4 class="coiny-regular">{{trip.destination}}</h4>
+                            <h6>{{trip.start_date.verbose_name}} - {{trip.end_date.verbose_name}}</h6>
+                            <p>{{trip.activities}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {%endfor%}
+    </div>
+</div>
+{%endblock content%}
