@@ -3,8 +3,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Item
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the packinglist index.")
 @login_required
 def create_item(request):
     if request.method == 'POST' and request.POST.get('name') and request.POST.get('description'):
@@ -43,6 +41,7 @@ def delete_item(request, item_id):
         item.delete()
 
     return redirect('packing_list')
+
 @login_required
 def packing_list(request):
     # Get only items belonging to the current user
