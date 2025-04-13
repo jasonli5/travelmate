@@ -1,13 +1,14 @@
 from openai import OpenAI
 import json
+import requests
 
 client = OpenAI(
-  base_url="https://openrouter.ai/api/v1",
-  api_key="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",
+  base_url="https://api.deepseek.com",
+  api_key="sk-fd5392f57137474da56cc90b24441db6",
 )
 
 completion = client.chat.completions.create(
-  model="deepseek/deepseek-r1-zero:free",
+  model="deepseek-chat",
   messages=[
     {
       "role": "user",
@@ -49,22 +50,17 @@ def get_ai_suggestions(location, month):
     }}
         """
     response = client.chat.completions.create(
-        model="deepseek/deepseek-r1-zero:free",
+        model="deepseek-chat",
         messages=[
             {
                 "role": "user",
                 "content": prompt,
             }
         ],
+        response_format={
+            'type': 'json_object'
+        }
     )
 
-    return response.choices[0].message.content
+    return json.loads(response.choices[0].message.content)
 
-print(get_ai_suggestions("Boston", "December"))
-
-try:
-    test = json.loads(get_ai_suggestions("Boston", "December"))
-except json.JSONDecodeError as e:
-    test = "Failed"
-    print(f"Error decoding JSON: {e}")
-print(test)
