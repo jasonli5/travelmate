@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Item
 from django.http import JsonResponse
-from .test import test
 from .api_utils import get_ai_suggestions
 from django.views.decorators.http import require_POST
 
