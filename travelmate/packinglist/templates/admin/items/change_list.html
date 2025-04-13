@@ -1,0 +1,37 @@
+{% extends "admin/change_list.html" %}
+
+{% block content_title %}
+    <h1>Manage Packing Items</h1>
+    <div class="row" style="margin: 20px 0;">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User-Added Items</h5>
+                    <p class="card-text">{{ user_count }} items</p>
+                    <a href="?is_ai_suggested__exact=0" class="btn btn-outline-primary">
+                        View Only
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">AI-Suggested Items</h5>
+                    <p class="card-text">{{ ai_count }} items</p>
+                    <a href="?is_ai_suggested__exact=1" class="btn btn-outline-primary">
+                        View Only
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block result_list %}
+    <style>
+        .ai-true { background-color: #f8f9fa; }
+        .ai-header { color: #6c757d; }
+    </style>
+    {{ block.super }}
+{% endblock %}

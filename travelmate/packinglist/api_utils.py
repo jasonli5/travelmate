@@ -35,10 +35,16 @@ completion = client.chat.completions.create(
     }
   ]
 )
-def get_ai_suggestions(location, month):
+def get_ai_suggestions(location, month, count, existing_items):
     """Fetch packing suggestions from DeepSeek API"""
+    existing_names = [item['name'].lower() for item in existing_items]
     prompt = f"""
-        Generate 5 essential packing items for a trip to {location} in the month of {month}.
+        Generate {count} essential packing items for a trip to {location} in the month of {month}.
+        
+        IMPORTANT RULES:
+        1. NEVER suggest these existing items: {', '.join(existing_names)}
+        2. If suggesting similar items, make them meaningfully different
+        
         For each item, provide:
         - A short title
         - A detailed description (1 sentence)

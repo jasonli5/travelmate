@@ -42,15 +42,50 @@
     {% endif %}
     <!-- ======= ADD THIS AI SUGGESTION PANEL ======= -->
     <div class="card mt-4">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">AI Packing Assistant</h5>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <button class="btn btn-success" onclick="getAISuggestions()">
+                <button id="aiSuggestBtn" class="btn btn-success" onclick="getAISuggestions()">
                     Get Smart Suggestions
                 </button>
-            </div>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+            <h6>AI-Suggested Items:</h6>
+            {% if ai_items %}
+                <div class="row">
+                    {% for item in ai_items %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ item.name }}</h6>
+                                {% if item.description %}
+                                <p class="card-text text-muted">{{ item.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent p-0">
+                                <div class="row g-0">
+                                    <button class="btn btn-sm btn-success"
+                                            onclick="addToList('{{ item.id }}')">
+                                        <i class="bi bi-person-plus"></i> Add to List
+                                    </button>
+                                    <button class="btn btn-sm btn-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteItemModal"
+                                            data-item-id="{{ item.id }}">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning mb-0">
+                    No AI-suggested items yet. Get suggestions By Pressing the Button!
+                </div>
+            {% endif %}
+        </div>
 
             <div id="aiLoading" class="text-center my-3" style="display:none;">
                 <div class="spinner-border text-primary" role="status">
@@ -61,6 +96,7 @@
 
             <div id="aiSuggestions" class="row mt-3"></div>
         </div>
+
     </div>
     <!-- ======= END AI PANEL ======= -->
     {% if user.is_authenticated %}
@@ -84,6 +120,7 @@
                                         class="form-control" id="description">
                                 </div>
                             </div>
+                            <input type="hidden" name="is_ai_suggested" value="False">
                             <div class="text-center mt-3">
                                 <button type="submit" class="btn btn-primary">
                                     Add Item
@@ -148,6 +185,7 @@
     </div>
 </div>
 
+
 <!-- Add this JavaScript block -->
 {% block scripts %}
 <script>
@@ -174,10 +212,13 @@ document.getElementById('deleteItemModal').addEventListener('show.bs.modal', fun
 });
 // ====== ADD NEW AI FUNCTIONS BELOW ======
 function getAISuggestions() {
-
+    const btn = document.getElementById('aiSuggestBtn');
     const container = document.getElementById('aiSuggestions');
     const loader = document.getElementById('aiLoading');
 
+    btn.disabled = true;
+    btn.classList.remove('btn-success');
+    btn.classList.add('btn-secondary');
     container.innerHTML = '';
     loader.style.display = 'block';
 
@@ -191,25 +232,35 @@ function getAISuggestions() {
     })
     .then(response => response.json())
     .then(data => {
+        btn.disabled = false;
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-success');
         loader.style.display = 'none';
 
         if (data.suggestions?.length > 0) {
-            let html = data.suggestions.map((item, index) => `
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title">${item.title}</h6>
-                            <p class="card-text text-muted">${item.description}</p>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                            <button onclick="addAISuggestion(${index})"
-                                    class="btn btn-sm btn-success w-100">
-                                Add to List
-                            </button>
-                        </div>
+            data.suggestions.forEach((item) => {
+                fetch("{% url 'item_create' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: `name=${encodeURIComponent(item.title)}&description=${encodeURIComponent(item.description || '')}&is_ai_suggested=True`
+                });
+            });
+
+            // Show a success message instead of buttons
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>${data.suggestions.length} items</strong> being added to your suggested packing list.
                     </div>
-                </div>`).join('');
-            container.innerHTML = html;
+                </div>
+            `;
+
+            // Optional: Refresh the list after a delay
+            setTimeout(() => window.location.reload(), 1500);
         } else {
             console.log("Response Structure:", {
             hasSuggestions: !!data.suggestions,
@@ -225,6 +276,11 @@ function getAISuggestions() {
         }
     })
     .catch(error => {
+        btn.disabled = false;
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-success');
+        loader.style.display = 'none';
+        console.error('Error:', error);
         loader.style.display = 'none';
         container.innerHTML = `
             <div class="alert alert-danger">
@@ -233,28 +289,34 @@ function getAISuggestions() {
     });
 }
 
-function addAISuggestion(index) {
-    const card = document.querySelectorAll('#aiSuggestions .card')[index];
-    const title = card.querySelector('.card-title').textContent;
-    const description = card.querySelector('.card-text').textContent;
 
+function addToList(itemId) {
     fetch("{% url 'item_create' %}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-CSRFToken': '{{ csrf_token }}'
         },
-        body: `name=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`
+        body: `existing_item_id=${itemId}`  // Different parameter name
     })
     .then(response => {
         if (response.ok) {
-            const btn = card.querySelector('button');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-check"></i> Added';
-            btn.classList.replace('btn-success', 'btn-secondary');
-            // Optional auto-refresh:
+            // Update the UI to reflect the change
+            const button = document.querySelector(`button[onclick="addToList('${itemId}')"]`);
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="bi bi-check"></i> Added';
+                button.classList.replace('btn-success', 'btn-secondary');
+            }
+            // Optional: refresh the page after a short delay
             setTimeout(() => window.location.reload(), 800);
+        } else {
+            alert('Failed to add item');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
     });
 }
 </script>
