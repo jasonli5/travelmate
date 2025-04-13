@@ -1,10 +1,11 @@
 from openai import OpenAI
 import json
 import requests
+import creds
 
 client = OpenAI(
   base_url="https://api.deepseek.com",
-  api_key="sk-fd5392f57137474da56cc90b24441db6",
+  api_key=creds.DEEPSEEK_API_KEY,
 )
 
 completion = client.chat.completions.create(
