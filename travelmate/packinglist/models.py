@@ -7,5 +7,6 @@ class Item(models.Model):
     description = models.TextField()
     user = models.ForeignKey(User,
         on_delete=models.CASCADE)
+    is_ai_suggested = models.BooleanField(default=False)
     def __str__(self):
         return str(self.id) + ' - ' + self.name

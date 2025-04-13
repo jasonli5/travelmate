@@ -1,11 +1,16 @@
 from openai import OpenAI
 import json
 import requests
-import creds
+from dotenv import load_dotenv
+import os
 
+def configure():
+    load_dotenv()
+
+configure()
 client = OpenAI(
   base_url="https://api.deepseek.com",
-  api_key=creds.DEEPSEEK_API_KEY,
+  api_key= os.getenv('api_key'),
 )
 
 completion = client.chat.completions.create(

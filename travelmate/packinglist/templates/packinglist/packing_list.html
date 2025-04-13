@@ -40,7 +40,29 @@
         Your packing list is empty. Add some items to get started!
     </div>
     {% endif %}
+    <!-- ======= ADD THIS AI SUGGESTION PANEL ======= -->
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">AI Packing Assistant</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <button class="btn btn-success" onclick="getAISuggestions()">
+                    Get Smart Suggestions
+                </button>
+            </div>
 
+            <div id="aiLoading" class="text-center my-3" style="display:none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Generating recommendations...</p>
+            </div>
+
+            <div id="aiSuggestions" class="row mt-3"></div>
+        </div>
+    </div>
+    <!-- ======= END AI PANEL ======= -->
     {% if user.is_authenticated %}
     <div class="container mt-4">
         <div class="row justify-content-center">
@@ -150,6 +172,91 @@ document.getElementById('deleteItemModal').addEventListener('show.bs.modal', fun
     const form = document.getElementById('deleteItemForm');
     form.action = `{% url 'item_delete' 0 %}`.replace('0', itemId);
 });
+// ====== ADD NEW AI FUNCTIONS BELOW ======
+function getAISuggestions() {
+
+    const container = document.getElementById('aiSuggestions');
+    const loader = document.getElementById('aiLoading');
+
+    container.innerHTML = '';
+    loader.style.display = 'block';
+
+    fetch("{% url 'ai_suggest' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `location=${encodeURIComponent(location)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        loader.style.display = 'none';
+
+        if (data.suggestions?.length > 0) {
+            let html = data.suggestions.map((item, index) => `
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">${item.title}</h6>
+                            <p class="card-text text-muted">${item.description}</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button onclick="addAISuggestion(${index})"
+                                    class="btn btn-sm btn-success w-100">
+                                Add to List
+                            </button>
+                        </div>
+                    </div>
+                </div>`).join('');
+            container.innerHTML = html;
+        } else {
+            console.log("Response Structure:", {
+            hasSuggestions: !!data.suggestions,
+            suggestionCount: data.suggestions?.length,
+            fullData: data
+        });
+        container.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-warning">
+                No suggestions found. Server response: ${JSON.stringify(data, null, 2)}
+            </div>
+        </div>`;
+        }
+    })
+    .catch(error => {
+        loader.style.display = 'none';
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Error loading suggestions. Try again.
+            </div>`;
+    });
+}
+
+function addAISuggestion(index) {
+    const card = document.querySelectorAll('#aiSuggestions .card')[index];
+    const title = card.querySelector('.card-title').textContent;
+    const description = card.querySelector('.card-text').textContent;
+
+    fetch("{% url 'item_create' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `name=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`
+    })
+    .then(response => {
+        if (response.ok) {
+            const btn = card.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-check"></i> Added';
+            btn.classList.replace('btn-success', 'btn-secondary');
+            // Optional auto-refresh:
+            setTimeout(() => window.location.reload(), 800);
+        }
+    });
+}
 </script>
 {% endblock %}
 {% endblock %}

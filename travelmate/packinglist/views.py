@@ -2,6 +2,9 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Item
+from django.http import JsonResponse
+from .test import test
+from .api_utils import get_ai_suggestions
 
 @login_required
 def create_item(request):
@@ -41,6 +44,38 @@ def delete_item(request, item_id):
         item.delete()
 
     return redirect('packing_list')
+@login_required
+def ai_suggest_items(request):
+    if request.method == 'POST':
+        location = request.POST.get('location')
+        days = int(request.POST.get('days', 3))
+
+        # Store location in session
+        request.session['last_location'] = location
+
+        # Get AI suggestions
+        suggestions = test()
+
+        # Return JSON for AJAX handling
+        return JsonResponse(suggestions)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@login_required
+def create_ai_item(request):
+    """Endpoint for adding AI-suggested items"""
+    if request.method == 'POST':
+        item = Item(
+            name=request.POST.get('title'),
+            description=request.POST.get('description'),
+            user=request.user,
+            is_ai_suggested=True  # Add this field to your model
+        )
+        item.save()
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @login_required
 def packing_list(request):
@@ -48,6 +83,9 @@ def packing_list(request):
     user_items = Item.objects.filter(user=request.user).order_by('-id')
 
     context = {
-        'items': user_items
+        'items': user_items,
+
+        'default_location': request.session.get('last_location', '')
     }
+
     return render(request, 'packinglist/packing_list.html', context)
