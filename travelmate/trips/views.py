@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # Create your views here.
-def trip_draft(request):
+def edit_trip(request):
     template_data= {}
     template_data['title'] = 'Editing New Trip'
     trip = inputTrip.objects.filter(user=request.user).first()
