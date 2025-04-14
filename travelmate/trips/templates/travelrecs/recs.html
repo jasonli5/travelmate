@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="text-center coiny-regular mb-4">Recommended Destinations</h2>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+
+    {% for rec in recs %}
+    <div class="col">
+      <a href="{% url 'home.index'%}?destination={{ rec.name|urlencode }}" class="text-decoration-none text-dark">
+        <div class="card h-100 shadow-sm" style="position: relative;">
+          <img src="{% static rec.image %}" class="card-img-top" alt="{{ rec.name }}" style="height: 200px; object-fit: cover;">
+          <div class="card-body text-center">
+            <h5 class="card-title coiny-regular">{{ rec.name }}</h5>
+          </div>
+          <div class="card-footer text-center bg-light description-hover" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; background: rgba(255, 255, 255, 0.9); padding: 1rem;">
+            <p class="card-text">{{ rec.description }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<script>
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+          const hover = card.querySelector('.description-hover');
+          hover.style.display = 'flex';
+          hover.style.alignItems = 'center';
+          hover.style.justifyContent = 'center';
+      });
+      card.addEventListener('mouseleave', () => {
+          const hover = card.querySelector('.description-hover');
+          hover.style.display = 'none';
+      });
+  });
+</script>
+{% endblock %}
