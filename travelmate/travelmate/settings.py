@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'home',
     'accounts',
     'packinglist',
+    'ai'
 ]
 
 MIDDLEWARE = [
