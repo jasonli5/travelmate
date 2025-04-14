@@ -39,7 +39,6 @@ def delete_trip(request, trip_id):
     if request.method == 'POST':
         trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
         trip.delete()
-        messages.success(request, 'Trip deleted successfully!')
         return redirect('trips')  # redirect to your trips listing page
     else:
         # If someone tries to access this URL directly via GET, redirect them
