@@ -38,6 +38,17 @@ class Migration(migrations.Migration):
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),
+            ]
+        )
+        migrations.CreateModel(
+            name='inputTrip',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('destination', models.CharField(max_length=200, verbose_name='Chosen Destination')),
+                ('start_date', models.DateField(verbose_name='Start Date')),
+                ('end_date', models.DateField(verbose_name='End Date')),
+                ('activities', models.TextField(max_length=500, verbose_name='Desired Activities')),
+                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

@@ -6,5 +6,8 @@ urlpatterns = [
     path('<int:pk>/', views.trip_detail, name='trip_detail'),
     path('new/', views.trip_create, name='trip_create'),
     path('<int:pk>/edit/', views.trip_update, name='trip_update'),
-    path('<int:pk>/delete/', views.trip_delete, name='trip_delete'),
+    path('trip-draft/<uidb64>', views.trip_draft, name='trips.draft'),
+    path('plan-trip/', views.plan_trip, name='plan_trip'),
+    path('my-trips/', views.trips_list, name='trips'),
 ]
+
