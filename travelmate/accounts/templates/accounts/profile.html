@@ -1,7 +1,7 @@
-{%extends 'base.html'%}
-{%load static%}
-{%block content%}
-<div class = "row my-4">
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row my-4">
     <div class="container">
         <div class="row mb-4 justify-content-center">
             <div class="col-5">
@@ -12,29 +12,26 @@
                                 <img src="{% static 'img/profile.png' %}" alt="logo" height="80px"/>
                             </div>
                             <div class="col-4">
-                                <h4 class="coiny-regular"> {{user.username}}</h4>
-                            <h6> Member since 0/0/0000 </h6>
+                                <h4 class="coiny-regular">{{user.username}}</h4>
+                                <h6>Member since {{ user.date_joined|date:"n/j/Y" }}</h6>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mb-5 justify-content-center">
-            <div class="col-4 text-center">
-                <a href='{%url 'home.index'%}' class="btn btn-primary"> Return Home </a>
+        <div class="row justify-content-center my-4">  <!-- Changed mb-5 to my-4 -->
+            <div class="col-auto mx-4">  <!-- Changed to col-auto and adjusted mx -->
+                <a href='{% url 'trips' %}' class="coiny-regular btn btn-link p-0 text-decoration-none" style="font-size: 1.5rem;">
+                    Saved Trips
+                </a>
             </div>
-        </div>
-        <div class="row my-3 justify-content-center">
-            <div class="col-4 mx-5">
-                <h3 class="coiny-regular"> Saved Trips</h3>
-                <p> trip cards go here </p>
-            </div>
-            <div class="col-4 mx-3">
-                <h3 class="coiny-regular"> Draft Trips</h3>
-                <p> trip cards go here </p>
+            <div class="col-auto mx-4">  <!-- Changed to col-auto and adjusted mx -->
+                <a href='{% url 'home.index' %}' class="coiny-regular btn btn-link p-0 text-decoration-none" style="font-size: 1.5rem;">
+                    Draft Trips
+                </a>
             </div>
         </div>
     </div>
 </div>
-{%endblock content%}
+{% endblock content %}
