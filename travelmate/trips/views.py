@@ -26,7 +26,7 @@ def plan_trip(request):
                 activities=request.POST['activities']
             )
             new_trip.save()
-            return redirect('trips')  # Redirect to a trips listing page
+            return redirect('trips')  # Redirect to a trips listing page, will need to change to planning page
 
         except Exception as e:
             messages.error(request, f'Error saving your trip: {str(e)}')
