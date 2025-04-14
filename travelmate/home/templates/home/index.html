@@ -16,25 +16,27 @@
                     <h3 class="card-title coiny-regular">Enter your trip details</h3>
                     <h6 class="card-sutitle">TravelMate uses API integrations to give you accurate weather, packing, and activites</h6>
                     <br/>
-                    <form action="" method="GET">
+                    <form method="POST" action="{% url 'trip_create' %}">
+                        {% csrf_token %}
                         <p>
                             <label for="destination">Destination: </label>
-                            <input id="destination" type="text" name="destination" value="{{destination}}">
+                            <input id="destination" type="text" name="destination" required>
                         </p>
                         <p>
-                            <label for"trip-dates"> Start/End Date(s) of Trip: </label>
-                            <input id="trip-dates" type="date" name="start-date" value="{{start_date}}"> -
-                            <input id="trip-dates" type="date" name="end-date" value="{{end_date}}">
+                            <label>Start/End Date(s) of Trip: </label>
+                            <input type="date" name="start_date" required> -
+                            <input type="date" name="end_date" required>
                         </p>
                         <p>
-                            <label for="activities"> Planned Activities: </label><br/>
-                            <textarea id="activities" name="activities" rows="6" value="{{activities}}" placeholder="Enter your activities, separated by commas"></textarea>
+                            <label for="notes">Planned Activities: </label><br/>
+                            <textarea id="notes" name="notes" rows="6" placeholder="Enter your activities, separated by commas"></textarea>
                         </p>
-                        <input type="submit" value="Plan My Trip!">
-                    </form>
+                        <input type="submit" value="Plan My Trip!" class="btn btn-primary">
+                    </form>                    
                 </div>
             </div>
         </div>        
     </div>
 </div>
+
 {%endblock content%}

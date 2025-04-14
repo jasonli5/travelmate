@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "accounts",
     "packinglist",
     "ai",
+    "trips",
 ]
 
 MIDDLEWARE = [
