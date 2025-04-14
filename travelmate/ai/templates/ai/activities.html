@@ -1,0 +1,56 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5 mb-5">
+  <h1 class="mb-4 text-center">Suggested Activities and Extra Information</h1>
+
+  <form method="POST" action="{% url 'suggest-activities' %}">
+    {% csrf_token %}
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <label for="location" class="form-label">Enter a Destination:</label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          class="form-control"
+          placeholder="e.g. Tokyo, Japan"
+          required
+        />
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          Get Suggestions
+        </button>
+      </div>
+    </div>
+  </form>
+
+  {% if activities %}
+  <div class="mt-5">
+    <h3>AI-Generated Activity Suggestions for {{ location }}</h3>
+    <div class="row mt-3">
+      {% for activity in activities %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ activity.name }}</h5>
+            <p class="card-text text-muted">{{ activity.description }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %} {% if info %}
+  <div class="mt-5">
+    <h3>Additional Information for Travelers</h3>
+    <ul class="list-group mt-3">
+      {% for item in info %}
+      <li class="list-group-item">{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% elif error %}
+  <div class="alert alert-danger mt-4" role="alert">{{ error }}</div>
+  {% endif %}
+</div>
+{% endblock %}
