@@ -22,3 +22,10 @@ body{
 .ms-footer {
     background-color: var(--dark);
 }
+#edit-trip{
+    border: 2px solid var(--dark);
+    border-radius: 25%;
+    background-color: var(--bckgrnd);
+    background-blend-mode: soft-light;
+
+}

@@ -10,31 +10,74 @@
           </div>
     </div>
     <div class="row m-3">
+        {%if user.is_authenticated%}
+        <div class="col-5 px-3 mx-auto text-center my-auto">
+    <div class="card w-100" id="form">
+        <div class="card-body">
+            <h3 class="card-title coiny-regular">Enter your trip details</h3>
+            <h6 class="card-subtitle mb-4">TravelMate uses API integrations to give you accurate weather, packing, and activities</h6>
+            <form method="POST" action="{% url 'plan_trip' %}">
+                {% csrf_token %}
+
+                <!-- Compact Row for Destination and Dates -->
+                <div class="row g-2 mb-3">
+                    <!-- Destination -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control form-control-sm" id="destination" name="destination" placeholder=" " required>
+                            <label for="destination">Destination</label>
+                        </div>
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" placeholder=" " required>
+                            <label for="start_date">Start Date</label>
+                        </div>
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" placeholder=" " required>
+                            <label for="end_date">End Date</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activities Field -->
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" id="activities" name="activities" style="height: 100px" placeholder=" "></textarea>
+                    <label for="activities">Activities (comma separated)</label>
+                    <small class="text-muted">e.g., hiking, swimming, sightseeing</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">Plan My Trip!</button>
+            </form>
+        </div>
+    </div>
+</div>
+        <div class="col-2 px-3 mx-auto text-center my-auto">
+            <h2 class="coiny-regular">OR</h2>
+        </div>
+        <div class="col-5 px-3 mx-auto text-center my-auto">
+            <div class="card w-75 py-3" id="form">
+                <h3 class="card-title coiny-regular mb-3">Don't know where to go?</h3>
+                <a href="#" class="btn btn-primary mx-auto mb-3"> Browse Premade Trip</a>
+            </div>
+        </div>
+        {%else%}
         <div class="col-5 px-3 mx-auto text-center my-auto" >
             <div class="card w-100" id="form">
                 <div class="card-body">
-                    <h3 class="card-title coiny-regular">Enter your trip details</h3>
-                    <h6 class="card-sutitle">TravelMate uses API integrations to give you accurate weather, packing, and activites</h6>
-                    <br/>
-                    <form action="" method="GET">
-                        <p>
-                            <label for="destination">Destination: </label>
-                            <input id="destination" type="text" name="destination" value="{{destination}}">
-                        </p>
-                        <p>
-                            <label for"trip-dates"> Start/End Date(s) of Trip: </label>
-                            <input id="trip-dates" type="date" name="start-date" value="{{start_date}}"> -
-                            <input id="trip-dates" type="date" name="end-date" value="{{end_date}}">
-                        </p>
-                        <p>
-                            <label for="activities"> Planned Activities: </label><br/>
-                            <textarea id="activities" name="activities" rows="6" value="{{activities}}" placeholder="Enter your activities, separated by commas"></textarea>
-                        </p>
-                        <input type="submit" value="Plan My Trip!">
-                    </form>
+                    <h3 class="card-title coiny-regular">Access your Account for the best experience</h3>
+                    <a href={% url 'accounts.login'%} class="btn btn-primary mx-auto">Login </a>
+                    <a href={% url 'accounts.signup'%} class="btn btn-primary mx-auto" >Sign Up </a>
                 </div>
             </div>
-        </div>        
+        </div>
+        {%endif%}
     </div>
 </div>
 {%endblock content%}
