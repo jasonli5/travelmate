@@ -1,35 +1,32 @@
-{%extends 'base.html'%}
-{%load static%}
-{%block content%}
-<div class = "row my-4">
-    <div class="container">
-        <div class="row mb-4 justify-content-center">
-            <div class="col-5">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-2">
-                                <img src="{% static 'img/profile.png' %}" alt="logo" height="80px"/>
-                            </div>
-                            <div class="col-4">
-                                <h4 class="coiny-regular"> {{user.username}}</h4>
-                            <h6> Member since 0/0/0000 </h6>
-                            </div>
-                        </div>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-4">
+    <!-- Profile Card -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <img src="{% static 'img/profile.png' %}" alt="profile picture" class="rounded-circle me-3" height="80" width="80">
+                    <div>
+                        <h4 class="coiny-regular mb-1">{{ user.username }}</h4>
+                        <h6 class="text-muted">Member since {{ user.date_joined|date:"M d, Y" }}</h6>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row my-3">
-            <div class="col-4 mx-5">
-                <h3 class="coiny-regular"> Saved Trips</h3>
-                <p> trip cards go here </p>
-            </div>
-            <div class="col-4 mx-3">
-                <h3 class="coiny-regular"> Draft Trips</h3>
-                <p> trip cards go here </p>
-            </div>
+    </div>
+
+    <!-- Trip Sections -->
+    <div class="row">
+        <div class="col-12 col-md-6 mb-4">
+            <h3 class="coiny-regular">Saved Trips</h3>
+            <p>Trip cards go here</p>
+        </div>
+        <div class="col-12 col-md-6 mb-4">
+            <h3 class="coiny-regular">Draft Trips</h3>
+            <p>Trip cards go here</p>
         </div>
     </div>
 </div>
-{%endblock content%}
+{% endblock %}
