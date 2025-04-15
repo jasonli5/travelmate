@@ -1,18 +1,18 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="py-5" style="background-color: #add8f3;">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-10 col-lg-8">
-        <h2 class="coiny-regular mb-4 text-center">About</h2>
-        <p>
-          TravelMate is a web application that makes planning and packing for trips easy. TravelMate provides users with many useful tools such as weather-appropriate outfit recommendations, travel tips, and a packing list.
-        </p>
-        <p>
-          TravelMate can accurately give outfit suggestions because it uses real-time weather data. This web application also allows users to be able to make specific “trips” that can be saved and reused.
-        </p>
-      </div>
+{%extends 'base.html'%}
+{%load static%}
+{%block content%}
+<div class="p-3 mt-4">
+    <div class="container">
+        <div class="row py-4 my-5">
+            <div class="col-5 mx-auto">
+                <h4 class="coiny-regular">About</h4>
+                <p>TravelMate is a web application that makes planning and packing for trips easy. TravelMate provides users with many useful tools such as weather appropriate outfit recommendations, travel tips, and a packing list.</p>
+                <p>TravelMate can accurately give outfit suggestions because it uses real-time weather data. This web application also allows users to be able to make specific “trips” that can be saved and updated, provided they have created an account. These trips store the destinations information as well as any packing lists curated. TravelMate can also be accessed from any devices and the packing lists can be shared with others to simplify the packing process for others on the trip. Users can make an account on the app as well.</p>  
+            </div>
+            <div class="col-3 mx-auto my-auto" style="background-color:var(--bckgrnd); width:450px; border-radius:25px; border: 2px black solid">
+                <img src="{%static 'img/logo3.png'%}" height="200px"/>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-{% endblock %}
+{%endblock content%}
