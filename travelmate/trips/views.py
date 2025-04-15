@@ -1,19 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # Create your views here.
-def edit_trip(request):
-    template_data= {}
-    template_data['title'] = 'Editing New Trip'
-    trip = inputTrip.objects.filter(user=request.user).first()
-
-    template_data['destination'] = trip.destination
-    template_data['dates'] = str(trip.start_date) + " - " + str(trip.end_date)
-    template_data['activities'] = trip.activites.split(",")
-
-    return render(request, 'trips/edit_trip.html', {'template_data' : template_data})
 
 def travel_recs(request):
     recs = [
