@@ -21,7 +21,7 @@ travelmate/.DS_Store
 __pycache__/
 *.pyc
 *.pyo
-db.sqlite3
+travelmate/db.sqlite3
 env/
 venv/
 *.log
