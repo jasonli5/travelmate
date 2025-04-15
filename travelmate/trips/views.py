@@ -4,6 +4,24 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # Create your views here.
+def trip_draft(request):
+    template_data= {}
+    template_data['title'] = 'Editing New Trip'
+    trip = inputTrip.objects.filter(user=request.user).first()
+    template_data['destination'] = trip.destination
+    template_data['dates'] = str(trip.start_date) + " - " + str(trip.end_date)
+    template_data['activities'] = trip.activites.split(",")
+    return render(request, 'trips/edit_trip.html', {'template_data' : template_data})
+def edit_trip(request):
+    template_data= {}
+    template_data['title'] = 'Editing New Trip'
+    trip = inputTrip.objects.filter(user=request.user).first()
+
+    template_data['destination'] = trip.destination
+    template_data['dates'] = str(trip.start_date) + " - " + str(trip.end_date)
+    template_data['activities'] = trip.activites.split(",")
+
+    return render(request, 'trips/edit_trip.html', {'template_data' : template_data})
 
 def travel_recs(request):
     recs = [
@@ -33,8 +51,9 @@ def plan_trip(request):
         except Exception as e:
             messages.error(request, f'Error saving your trip: {str(e)}')
 
+    destination = request.GET.get('destination', '')
     # If GET request or if there was an error, render the form page
-    return render(request, 'home/index.html')
+    return render(request, 'home/index.html', {'destination': destination})
 @login_required
 def trips_list(request):
     trips = inputTrip.objects.filter(user=request.user)
