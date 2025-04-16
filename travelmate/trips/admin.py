@@ -1,9 +1,8 @@
 # trips/admin.py
 from django.contrib import admin
-from .models import inputTrip, travelRecommendations
+from .models import inputTrip
 from django.utils.html import format_html
 from django.contrib.admin import DateFieldListFilter
-from django.templatetags.static import static
 
 
 @admin.register(inputTrip)
@@ -54,19 +53,3 @@ class TripAdmin(admin.ModelAdmin):
         css = {
             'all': ('css/admin-trips.css',)
         }
-
-@admin.register(travelRecommendations)
-class travelRecommendationsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description_preview', 'image_preview')
-    search_fields = ('name', 'description')
-
-    def description_preview(self, obj):
-        return (obj.description[:75] + '...') if len(obj.description) > 75 else obj.description
-    description_preview.short_description = 'Description'
-
-    def image_preview(self, obj):
-        if obj.image:
-            image_url = static(f'img/{obj.image}')
-            return format_html('<img src="{}" width="100" style="border-radius: 8px;"/>', obj.image.url)
-        return "No image"
-    image_preview.short_description = 'Image'
