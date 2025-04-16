@@ -29,5 +29,6 @@ venv/
 *.DS_Store
 .idea/
 .vscode/
+travelmate/.env
 .env
 *.env
