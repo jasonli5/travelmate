@@ -9,7 +9,7 @@
     <div class="col">
       <a href="{% url 'home.index'%}?destination={{ rec.name|urlencode }}" class="text-decoration-none text-dark">
         <div class="card h-100 shadow-sm" style="position: relative;">
-          <img src="{% static rec.image %}" class="card-img-top" alt="{{ rec.name }}" style="height: 200px; object-fit: cover;">
+          <img src="{{ rec.image.url }}" class="card-img-top" alt="{{ rec.name }}" style="height: 200px; object-fit: cover;">
           <div class="card-body text-center">
             <h5 class="card-title coiny-regular">{{ rec.name }}</h5>
           </div>
