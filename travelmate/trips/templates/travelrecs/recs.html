@@ -7,7 +7,7 @@
 
     {% for rec in recs %}
     <div class="col">
-      <a href="{% url 'home.index'%}?destination={{ rec.name|urlencode }}" class="text-decoration-none text-dark">
+      <a href="{% url 'add_travel_recs'%}?destination={{ rec.name|urlencode }}" class="text-decoration-none text-dark">
         <div class="card h-100 shadow-sm" style="position: relative;">
           <img src="{{ rec.image.url }}" class="card-img-top" alt="{{ rec.name }}" style="height: 200px; object-fit: cover;">
           <div class="card-body text-center">
