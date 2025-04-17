@@ -18,3 +18,12 @@ class inputTrip(models.Model):
         ordering = ['created_at']  # Optional: orders trips by start date (newest first)
         verbose_name = "Trip"  # Optional: nicer name in admin
         verbose_name_plural = "Trips"  # Optional
+
+class travelRecommendations(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    image = models.ImageField(upload_to='travel_recs/')
+
+    def __str__(self):
+        return self.name
+
