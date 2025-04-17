@@ -24,7 +24,7 @@
                     <!-- Destination -->
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control form-control-sm" id="destination" name="destination" placeholder=" " required>
+                            <input type="text" class="form-control form-control-sm" id="destination" name="destination" placeholder=" " required value="{{ request.GET.destination|default:''}}">
                             <label for="destination">Destination</label>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
         <div class="col-5 px-3 mx-auto text-center my-auto">
             <div class="card w-75 py-3" id="form">
                 <h3 class="card-title coiny-regular mb-3">Don't know where to go?</h3>
-                <a href="#" class="btn btn-primary mx-auto mb-3"> Browse Premade Trip</a>
+                <a href="{% url 'travel_recs' %}" class="btn btn-primary mx-auto mb-3">Browse Popular Destinations</a>
             </div>
         </div>
         {%else%}
