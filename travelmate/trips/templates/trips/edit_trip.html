@@ -1,50 +1,71 @@
-{%extends 'base.html'%}
-{%load static%}
-{%block content%}
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block content %}
 <div class="p-5 m-3">
     <div class="container">
-        <div class="row my-2 mx-auto p-3 text-center" id="edit-trip">
-            <div class="col-4 mx-auto mb-3">
-                <h2 class="coiny-regular"> Placeholder Trip </h2>
-                <a href="#" class="btn btn-primary">Add Traveler</a> <a href="#" class="btn btn-primary"> Export as PDF </a>
+        <div class="row justify-content-center my-4" id="edit-trip">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-center coiny-regular mb-4">Edit Trip: {{ trip.destination }}</h2>
+        
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <!-- Basic Trip Info -->
+                            <div class="mb-3">
+                                <label for="id_destination" class="form-label">Chosen Destination</label>
+                                {{ form.destination|add_class:"form-control" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_start_date" class="form-label">Start Date</label>
+                                {{ form.start_date|add_class:"form-control" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_end_date" class="form-label">End Date</label>
+                                {{ form.end_date|add_class:"form-control" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_activities" class="form-label">Desired Activities</label>
+                                {{ form.activities|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Weather -->
+                            <div class="my-4 p-3 bg-light rounded text-center">
+                                <h4 class="coiny-regular">Weather</h4>
+                                <textarea name="weather" class="form-control mt-2">{{ trip.weather }}</textarea>
+                            </div>
+
+                            <!-- Packing List -->
+                            <div class="my-4 p-3 bg-light rounded text-center">
+                                <h4 class="coiny-regular">Packing List</h4>
+                                <textarea name="packing_list" class="form-control mt-2" rows="4">{{ trip.packing_list }}</textarea>
+                            </div>
+
+                            <!-- Activities -->
+                            <div class="my-4 p-3 bg-light rounded text-center">
+                                <h4 class="coiny-regular">Activities</h4>
+                                <textarea name="activities_list" class="form-control mt-2" rows="4">{{ trip.activities_list }}</textarea>
+                            </div>
+
+                            <!-- Additional Considerations -->
+                            <div class="my-4 p-3 bg-light rounded text-center">
+                                <h4 class="coiny-regular">Additional Considerations</h4>
+                                <textarea name="considerations" class="form-control mt-2" rows="3">{{ trip.considerations }}</textarea>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <a href="{% url 'trips' %}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="row my-2 p-3" id="edit-trip">
-            <div class="col-7 mb-3">
-                <h4 class="coiny-regular">Weather</h4>
-                <p>Info Here from API</p>
-            </div>
-        </div>
-        <div class="row my-2 p-3" id="edit-trip">
-            <div class="col-7 mb-3">
-                <h4 class="coiny-regular">Packing List</h4>
-                <ul>
-                    <li> Item 
-                    <li> Item
-                    <li> Item 
-                    <li> Item
-                </ul>
-                <a href="#" class="btn btn-primary">Edit</a>
-            </div>
-        </div>
-        <div class="row my-2 p-3" id="edit-trip">
-            <div class="col-7 mb-3">
-                <h4 class="coiny-regular">Activities</h4>
-                <ul>
-                    <li> Item
-                    <li> Item
-                    <li> Item
-                    <li> Item
-                </ul>
-            </div>
-        </div>
-        <div class="row my-2" id="edit-trip">
-            <h4 class="coiny-regular">Additional Considerations</h4>
-            <p>Info Here</p>
-        </div>
-        <div class="row my-2 mx-auto" id="edit-trip">
-            <a href="#" class="btn btn-primary">Save Trip</a>
-        </div>
+        </div>        
     </div>
 </div>
-{%endblock content%}
+{% endblock content %}
