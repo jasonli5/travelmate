@@ -149,7 +149,7 @@ def plan_trip(request):
 
                     )
                     new_activity.save()
-            
+
             return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip
 
 
@@ -191,6 +191,5 @@ def edit_trip(request, trip_id):
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
-    
-    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
 
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items, 'activity_formset': activity_formset})
