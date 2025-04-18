@@ -1,8 +1,4 @@
 from django.shortcuts import render
-
-from ai.models import Activity
-from ai.forms import ActivityFormSet
-from ai.api_utils import get_ai_additional_info
 from .models import inputTrip, travelRecommendations
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
@@ -12,6 +8,9 @@ from django.contrib import messages
 from datetime import date, timedelta
 from django.utils import timezone
 from .forms import TripForm
+from ai.models import Activity
+from ai.forms import ActivityFormSet
+from ai.api_utils import get_ai_additional_info
 
 
 PREDEFINED_TRIPS = {
@@ -89,8 +88,8 @@ def add_travel_recs(request):
                 destination=trip_data['destination'],
                 start_date=start_date,
                 end_date=end_date,
+                activities=trip_data['activities']
             )
-
             # Generate additional info using AI
             info = get_ai_additional_info(new_trip.destination)
             if info:
@@ -109,10 +108,10 @@ def add_travel_recs(request):
 
         except Exception as e:
             messages.error(request, f'Error creating trip: {str(e)}')
-            return redirect('home.index')
+            return redirect('home/index')
 
     # If no matching destination found, proceed normally
-    return render(request, 'home.index', {'destination': dest_key})
+    return render(request, 'home/index', {'destination': dest_key})
 
 @login_required  # Ensures only logged-in users can access this
 def plan_trip(request):
@@ -124,9 +123,8 @@ def plan_trip(request):
                 destination=request.POST['destination'],
                 start_date=request.POST['start_date'],
                 end_date=request.POST['end_date'],
-                # activities=request.POST['activities']
+                #activities=request.POST['activities']
             )
-
             # Generate additional info using AI
             info = get_ai_additional_info(new_trip.destination)
 
@@ -144,8 +142,8 @@ def plan_trip(request):
                         is_ai_suggested=False
                     )
                     new_activity.save()
-            
-            return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip
+
+            return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip  # Redirect to a trips listing page, will need to change to planning page
 
         except Exception as e:
             messages.error(request, f'Error saving your trip: {str(e)}')
@@ -179,14 +177,15 @@ def edit_trip(request, trip_id):
         if form.is_valid() and activity_formset.is_valid():
             form.save()
             activity_formset.save()
-            messages.success(request, 'Trip updated successfully!')
             return redirect('trips')  # adjust this to match your trip list url name
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
-    
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items})
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
+
+
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
 
