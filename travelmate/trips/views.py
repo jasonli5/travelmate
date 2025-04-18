@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import timedelta
 from django.utils import timezone
+from .forms import TripForm
+
 
 PREDEFINED_TRIPS = {
     'paris': {
@@ -128,3 +130,17 @@ def delete_trip(request, trip_id):
         # If someone tries to access this URL directly via GET, redirect them
         return redirect('trips')
 
+@login_required
+def edit_trip(request, trip_id):
+    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+    
+    if request.method == 'POST':
+        form = TripForm(request.POST, instance=trip)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Trip updated successfully!')
+            return redirect('trips')  # adjust this to match your trip list url name
+    else:
+        form = TripForm(instance=trip)
+    
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip})
