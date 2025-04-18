@@ -1,18 +1,31 @@
-{%extends 'base.html'%}
-{%load static%}
-{%block content%}
-<div class="p-3 mt-4">
-    <div class="container">
-        <div class="row py-4 my-5">
-            <div class="col-5 mx-auto">
-                <h4 class="coiny-regular">About</h4>
-                <p>TravelMate is a web application that makes planning and packing for trips easy. TravelMate provides users with many useful tools such as weather appropriate outfit recommendations, travel tips, and a packing list.</p>
-                <p>TravelMate can accurately give outfit suggestions because it uses real-time weather data. This web application also allows users to be able to make specific “trips” that can be saved and updated, provided they have created an account. These trips store the destinations information as well as any packing lists curated. TravelMate can also be accessed from any devices and the packing lists can be shared with others to simplify the packing process for others on the trip. Users can make an account on the app as well.</p>  
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center align-items-center">
+        <!-- Text Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="bg-white p-4 rounded shadow-sm">
+                <h3 class="coiny-regular mb-3">About</h3>
+                <p>
+                    TravelMate is a web application that makes planning and packing for trips easy.
+                    It provides users with useful tools such as weather-appropriate outfit recommendations,
+                    travel tips, and a packing list.
+                </p>
+                <p>
+                    TravelMate uses real-time weather data to give accurate outfit suggestions. Users can also
+                    create and save “trips” with destination and packing details. These trips can be accessed
+                    from any device and shared with others to streamline the process.
+                </p>
             </div>
-            <div class="col-3 mx-auto my-auto" style="background-color:var(--bckgrnd); width:450px; border-radius:25px; border: 2px black solid">
-                <img src="{%static 'img/logo3.png'%}" height="200px"/>
+        </div>
+
+        <!-- Image Section -->
+        <div class="col-lg-4 text-center">
+            <div class="bg-white p-3 rounded shadow-sm">
+                <img src="{% static 'img/logo3.png' %}" height="200px" alt="TravelMate Logo" class="img-fluid">
             </div>
         </div>
     </div>
 </div>
-{%endblock content%}
+{% endblock content %}
