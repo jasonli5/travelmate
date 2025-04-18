@@ -38,7 +38,7 @@ if API_KEY and is_api_key_valid(API_KEY):
     )
 
 
-def get_ai_suggestions(location, month, count, existing_items):
+def get_ai_suggestions(location, start, end, count, existing_items):
     """Fetch packing suggestions from DeepSeek API"""
     if not client:
         return {
@@ -72,7 +72,7 @@ def get_ai_suggestions(location, month, count, existing_items):
         }
     existing_names = [item["name"].lower() for item in existing_items]
     prompt = f"""
-        Generate {count} essential packing items for a trip to {location} in the month of {month}.
+        Generate {count} essential packing items for a trip to {location} from the day {start} to end {end}.
         
         IMPORTANT RULES:
         1. NEVER suggest these existing items: {', '.join(existing_names)}

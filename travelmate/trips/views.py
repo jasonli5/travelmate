@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import inputTrip, travelRecommendations
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
+from packinglist.models import Item
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import timedelta
@@ -133,14 +134,15 @@ def delete_trip(request, trip_id):
 @login_required
 def edit_trip(request, trip_id):
     trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
-    
+    all_items = Item.objects.filter(trip=trip_id)  # Add this line
+    items = all_items.filter(is_ai_suggested=False).order_by("id")
+    ai_items = all_items.filter(is_ai_suggested=True).order_by("id")
     if request.method == 'POST':
         form = TripForm(request.POST, instance=trip)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Trip updated successfully!')
             return redirect('trips')  # adjust this to match your trip list url name
     else:
         form = TripForm(instance=trip)
     
-    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip})
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items})
