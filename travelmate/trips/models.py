@@ -13,6 +13,8 @@ class inputTrip(models.Model):
     # ✅ Add these new editable fields:
     weather = models.TextField("Weather Info", blank=True, null=True)
     packing_list = models.TextField("Packing List", blank=True, null=True)
+
+    activities_list = models.TextField("Activities List", blank=True, null=True)
     considerations = models.JSONField("Additional Considerations", blank=True, null=True)
 
     def __str__(self):

@@ -43,7 +43,6 @@
                                         <div class="card mb-3 text-start activity-form">
                                             <div class="card-body">
                                                 {{ form.id }}
-
                                                 <div class="row align-items-center g-0">
                                                     <div class="col-md-9 d-flex align-items-center">
                                                         <label class="form-label me-2">Activity</label>
@@ -55,7 +54,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+
+                                        </div>                                  
+
                                     {% endfor %}
                                 </div>
                                 <button type="button" class="btn btn-success mt-3" id="add-activity">Add Activity</button>
@@ -116,9 +117,11 @@
                                             'ContentType': 'application/json',
                                             'X-CSRFToken': '{{ csrf_token }}'
                                         },
-                                        body: new URLSearchParams({
-                                            location: tripDestination,
-                                            already_added: alreadyAddedActivities ? JSON.stringify(alreadyAddedActivities.split(', ')) : ''
+
+                                        body: new URLSearchParams({ 
+                                            location: tripDestination, 
+                                            already_added: alreadyAddedActivities ? JSON.stringify(alreadyAddedActivities.split(', ')) : '' 
+
                                         })
                                     })
                                         .then(response => {
