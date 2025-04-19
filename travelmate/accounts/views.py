@@ -7,7 +7,6 @@ from django.contrib.auth.views import LoginView, PasswordResetView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 
-
 class RegisterView(View):
     form_class = RegisterForm
     initial = {"key": "value"}
@@ -16,7 +15,7 @@ class RegisterView(View):
     def get(self, request, *args, **kwargs):
         form = self.form_class(initial=self.initial)
         return render(request, self.template_name, {"form": form})
-
+        
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
@@ -25,7 +24,6 @@ class RegisterView(View):
             user.email = form.cleaned_data.get("email")
             user.save()
             return redirect("accounts.login")
-
         return render(request, self.template_name, {"form": form})
 
 

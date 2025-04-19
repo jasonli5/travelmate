@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.exceptions import ValidationError
 
 
 class RegisterForm(UserCreationForm):
@@ -47,7 +48,11 @@ class RegisterForm(UserCreationForm):
             }
         ),
     )
-
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("This email address is already in use. Please use a different email or reset password on login page")
+        return email
 
 class Meta:
     model = User
