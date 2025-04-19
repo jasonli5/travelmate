@@ -7,7 +7,7 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 ACTIVITY_SYSTEM_PROMPT = """
     You are a helpful travel consultant. Recommend activites or places to visit in the provided location. 
     
-    Please only respond in a JSON format with a list of at most 6 activities and a short 1 sentence description for each.
+    Please only respond in a JSON format with a list of at most 6 activities.
 
     Do NOT hallucinate or make up information. If you don't know the answer, say "I don't know".
 
@@ -16,11 +16,9 @@ ACTIVITY_SYSTEM_PROMPT = """
         "activities": [
             {
                 "name": "Visit the Eiffel Tower",
-                "description": "Experience breathtaking views of Paris from the top of this iconic landmark."
             },
             {
                 "name": "Explore the Louvre Museum",
-                "description": "Discover world-famous art pieces, including the Mona Lisa and the Venus de Milo."
             }
         ]
     }
