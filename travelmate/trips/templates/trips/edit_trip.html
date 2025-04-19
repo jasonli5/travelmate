@@ -27,11 +27,7 @@
                                 <label for="id_end_date" class="form-label">End Date</label>
                                 {{ form.end_date|add_class:"form-control" }}
                             </div>
-                            <div class="mb-3">
-                                <label for="id_activities" class="form-label">Desired Activities</label>
-                                {{ form.activities|add_class:"form-control" }}
-                            </div>
-
+                            
                             <!-- Weather -->
                             <div class="my-4 p-3 bg-light rounded text-center">
                                 <h4 class="coiny-regular">Weather</h4>
@@ -46,14 +42,154 @@
 
                             <!-- Activities -->
                             <div class="my-4 p-3 bg-light rounded text-center">
-                                <h4 class="coiny-regular">Activities</h4>
-                                <textarea name="activities_list" class="form-control mt-2" rows="4">{{ trip.activities_list }}</textarea>
+                                <h4 class="coiny-regular">Planned Activities</h4>
+                                {{ activity_formset.management_form }}
+                                <div id="activity-forms-container">
+                                    {% for form in activity_formset %}
+                                        <div class="card mb-3 text-start activity-form">
+                                            <div class="card-body">
+                                                {{ form.id }}
+                                                
+                                                <div class="row align-items-center g-0">
+                                                    <div class="col-md-9 d-flex align-items-center">
+                                                        <label class="form-label me-2">Activity</label>
+                                                        {{ form.name|add_class:"form-control" }}
+                                                    </div>
+                                                    <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                                        <label class="form-check-label me-2">Delete</label>
+                                                        {{ form.DELETE|add_class:"form-check-input" }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>                                  
+                                    {% endfor %}
+                                </div>
+                                <button type="button" class="btn btn-success mt-3" id="add-activity">Add Activity</button>
+                                <button type="button" class="btn btn-info mt-3" id="suggest-activity">Suggest Activities</button>
                             </div>
+
+                            <script>
+                                document.getElementById('add-activity').addEventListener('click', function() {
+                                    const formsetPrefix = '{{ activity_formset.prefix }}';
+                                    const totalFormsInput = document.querySelector(`input[name="${formsetPrefix}-TOTAL_FORMS"]`);
+                                    const totalForms = parseInt(totalFormsInput.value, 10);
+                                    const newFormIndex = totalForms;
+
+                                    const emptyFormTemplate = `
+                                    <div class="card mb-3 text-start activity-form">
+                                        <div class="card-body">
+                                            <input type="hidden" name="${formsetPrefix}-${newFormIndex}-id" id="id_${formsetPrefix}-${newFormIndex}-id">
+                                            <div class="row align-items-center g-0">
+                                                <div class="col-md-9 d-flex align-items-center">
+                                                    <label class="form-label me-2">Activity</label>
+                                                    <input type="text" name="${formsetPrefix}-${newFormIndex}-name" class="form-control" id="id_${formsetPrefix}-${newFormIndex}-name">
+                                                </div>
+                                                <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                                    <label class="form-check-label me-2">Delete</label>
+                                                    <input type="checkbox" name="${formsetPrefix}-${newFormIndex}-DELETE" class="form-check-input" id="id_${formsetPrefix}-${newFormIndex}-DELETE">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>`;
+
+                                    const container = document.getElementById('activity-forms-container');
+                                    container.insertAdjacentHTML('beforeend', emptyFormTemplate);
+
+                                    totalFormsInput.value = totalForms + 1;
+                                });
+                                document.getElementById('suggest-activity').addEventListener('click', function() {
+                                    const suggestButton = this;
+                                    suggestButton.disabled = true;
+
+                                    // Create and show loading spinner
+                                    const spinner = document.createElement('div');
+                                    spinner.className = 'spinner-border text-primary';
+                                    spinner.role = 'status';
+                                    spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+                                    document.getElementById('activity-forms-container').appendChild(spinner);
+
+                                    const tripDestination = "{{ trip.destination|escapejs }}";
+
+                                    const activityInputs = document.querySelectorAll('input[name^="{{ activity_formset.prefix }}-"][name$="-name"]');
+                                    const alreadyAddedActivities = Array.from(activityInputs)
+                                        .map(input => input.value.trim())
+                                        .filter(value => value !== '')
+                                        .join(', ');
+                                    
+                                    fetch('/ai/suggest-activities', {
+                                        method: 'POST',
+                                        headers: {
+                                            'ContentType': 'application/json',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        },
+                                        body: new URLSearchParams({ 
+                                            location: tripDestination, 
+                                            already_added: alreadyAddedActivities ? JSON.stringify(alreadyAddedActivities.split(', ')) : '' 
+                                        })
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Failed to fetch suggested activities');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            const formsetPrefix = '{{ activity_formset.prefix }}';
+                                            const totalFormsInput = document.querySelector(`input[name="${formsetPrefix}-TOTAL_FORMS"]`);
+                                            let totalForms = parseInt(totalFormsInput.value, 10);
+
+                                            const container = document.getElementById('activity-forms-container');
+
+                                            data.activities.forEach(activity => {
+                                                const newFormIndex = totalForms;
+
+                                                const activityFormTemplate = `
+                                                <div class="card mb-3 text-start activity-form">
+                                                    <div class="card-body">
+                                                        <input type="hidden" name="${formsetPrefix}-${newFormIndex}-id" id="id_${formsetPrefix}-${newFormIndex}-id">
+                                                        <div class="row align-items-center g-0">
+                                                            <div class="col-md-9 d-flex align-items-center">
+                                                                <label class="form-label me-2">Activity</label>
+                                                                <input type="text" name="${formsetPrefix}-${newFormIndex}-name" class="form-control" id="id_${formsetPrefix}-${newFormIndex}-name" value="${activity.name}">
+                                                            </div>
+                                                            <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                                                <label class="form-check-label me-2">Delete</label>
+                                                                <input type="checkbox" name="${formsetPrefix}-${newFormIndex}-DELETE" class="form-check-input" id="id_${formsetPrefix}-${newFormIndex}-DELETE">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+
+                                                container.insertAdjacentHTML('beforeend', activityFormTemplate);
+                                                totalForms++;
+                                            });
+
+                                            totalFormsInput.value = totalForms;
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            alert('Could not fetch suggested activities. Please try again later.');
+                                        })
+                                        .finally(() => {
+                                            suggestButton.disabled = false;
+                                            // Remove loading spinner
+                                            spinner.remove();
+                                        });
+                                });
+                            </script>
 
                             <!-- Additional Considerations -->
                             <div class="my-4 p-3 bg-light rounded text-center">
                                 <h4 class="coiny-regular">Additional Considerations</h4>
-                                <textarea name="considerations" class="form-control mt-2" rows="3">{{ trip.considerations }}</textarea>
+                                <div id="considerations-container">
+                                    {% for consideration in trip.considerations %}
+                                        <div class="card mb-2 shadow-sm">
+                                            <div class="card-body">
+                                                <p class="mb-0">{{ consideration }}</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
 
                             <!-- Submit -->

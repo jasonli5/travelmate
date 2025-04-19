@@ -26,19 +26,19 @@ ACTIVITY_SYSTEM_PROMPT = """
     }
 """
 
-def get_ai_activity_suggestions(location):
+def get_ai_activity_suggestions(location, already_added=None):
     try:
         response = openai.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {
-                    "role": "system",
-                    "content": ACTIVITY_SYSTEM_PROMPT,
-                },
-                {
-                    "role": "user",
-                    "content": f"{location}",
-                }
+            {
+                "role": "system",
+                "content": ACTIVITY_SYSTEM_PROMPT,
+            },
+            {
+                "role": "user",
+                "content": f"{location}. {'I have already added these activities: ' + ', '.join(already_added) if already_added else ''}",
+            }
             ],
         )
         suggestions = response.choices[0].message.content.strip()

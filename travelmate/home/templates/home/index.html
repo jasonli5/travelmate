@@ -32,7 +32,7 @@
                     <!-- Start Date -->
                     <div class="col-md-3">
                         <div class="form-floating">
-                            <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" placeholder=" " required>
+                            <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" placeholder=" " required min="{{ today }}">
                             <label for="start_date">Start Date</label>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                     <!-- End Date -->
                     <div class="col-md-3">
                         <div class="form-floating">
-                            <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" placeholder=" " required>
+                            <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" placeholder=" " required min="{{ today }}">
                             <label for="end_date">End Date</label>
                         </div>
                     </div>
