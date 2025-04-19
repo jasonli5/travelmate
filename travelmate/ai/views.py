@@ -1,27 +1,46 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views import View
 
 from .api_utils import get_ai_activity_suggestions, get_ai_additional_info
 
 
-@login_required
-def suggest_activities(request):
-    if request.method == "POST":
+@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+class SuggestActivitiesAPI(View):
+    def post(self, request):
         location = request.POST.get("location")
-        # For demonstration, we'll use dummy data
-        # Dummy data for demonstration
+        already_added = request.POST.get("already_added")
+        if already_added:
+            already_added = already_added.split(",")
+        else:
+            already_added = []
 
         if not location:
-            return render(request, "ai/activities.html", {"error": "Please provide a location."})
+            return JsonResponse({"error": "Please provide a location."}, status=400)
 
-        activities = get_ai_activity_suggestions(location)
+        activities = get_ai_activity_suggestions(location, already_added)
+
+        if activities is None:
+            return JsonResponse({"error": "Error fetching AI suggestions."}, status=500)
+
+        return JsonResponse({"location": location, "activities": activities}, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+class AdditionalInfoAPI(View):
+    def post(self, request):
+        location = request.POST.get("location")
+
+        if not location:
+            return JsonResponse({"error": "Please provide a location."}, status=400)
 
         info = get_ai_additional_info(location)
 
-        if activities is None or info is None:
-            return render(request, "ai/activities.html", {"error": "Error fetching AI suggestions."})
+        if info is None:
+            return JsonResponse({"error": "Error fetching additional info."}, status=500)
 
-        return render(request, "ai/activities.html", {"location": location, "activities": activities, "info": info})
-    else:
-        # If not a POST request, render the initial form
-        return render(request, "ai/activities.html")
+        return JsonResponse({"location": location, "info": info}, status=200)

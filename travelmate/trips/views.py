@@ -1,11 +1,15 @@
 from django.shortcuts import render
+
+from ai.models import Activity
+from ai.forms import ActivityFormSet
+from ai.api_utils import get_ai_additional_info
 from .models import inputTrip, travelRecommendations
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
 from packinglist.models import Item
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from datetime import timedelta
+from datetime import date, timedelta
 from django.utils import timezone
 from .forms import TripForm
 
@@ -85,10 +89,24 @@ def add_travel_recs(request):
                 destination=trip_data['destination'],
                 start_date=start_date,
                 end_date=end_date,
-                activities=trip_data['activities']
             )
+
+            # Generate additional info using AI
+            info = get_ai_additional_info(new_trip.destination)
+            if info:
+                new_trip.considerations = info
+
             new_trip.save()
-            return redirect('trips')
+
+            if trip_data['activities']:
+                for activity in trip_data['activities'].split(','):
+                    new_activity = Activity(
+                        name=activity.strip(),
+                        trip=new_trip,
+                        is_ai_suggested=False
+                    )
+                    new_activity.save()
+            return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the trips list page
 
         except Exception as e:
             messages.error(request, f'Error creating trip: {str(e)}')
@@ -107,17 +125,35 @@ def plan_trip(request):
                 destination=request.POST['destination'],
                 start_date=request.POST['start_date'],
                 end_date=request.POST['end_date'],
-                activities=request.POST['activities']
+                # activities=request.POST['activities']
             )
-            new_trip.save()
-            return redirect('trips')  # Redirect to a trips listing page, will need to change to planning page
+
+            # Generate additional info using AI
+            info = get_ai_additional_info(new_trip.destination)
+
+            if info:
+                new_trip.considerations = info
+
+            new_trip.save() # Save trip first
+
+            if request.POST['activities']:
+                parsed_activities = request.POST['activities'].split(',')
+                for activity in parsed_activities:
+                    new_activity = Activity(
+                        name=activity.strip(),
+                        trip=new_trip,
+                        is_ai_suggested=False
+                    )
+                    new_activity.save()
+            
+            return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip
 
         except Exception as e:
             messages.error(request, f'Error saving your trip: {str(e)}')
 
     destination = request.GET.get('destination', '')
     # If GET request or if there was an error, render the form page
-    return render(request, 'home/index.html', {'destination': destination})
+    return render(request, 'home/index.html', {'destination': destination, 'today': date.today().isoformat()})
 @login_required
 def trips_list(request):
     trips = inputTrip.objects.filter(user=request.user)
@@ -139,10 +175,19 @@ def edit_trip(request, trip_id):
     ai_items = all_items.filter(is_ai_suggested=True).order_by("id")
     if request.method == 'POST':
         form = TripForm(request.POST, instance=trip)
-        if form.is_valid():
+        activity_formset = ActivityFormSet(request.POST, instance=trip)
+
+        if form.is_valid() and activity_formset.is_valid():
             form.save()
+            activity_formset.save()
+            messages.success(request, 'Trip updated successfully!')
             return redirect('trips')  # adjust this to match your trip list url name
     else:
         form = TripForm(instance=trip)
+        activity_formset = ActivityFormSet(instance=trip)
     
+
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items})
+
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
+
