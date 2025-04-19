@@ -108,16 +108,17 @@ def add_travel_recs(request):
                     new_activity = Activity(
                         name=activity.strip(),
                         trip=new_trip,
+
                     )
                     new_activity.save()
             return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the trips list page
 
         except Exception as e:
             messages.error(request, f'Error creating trip: {str(e)}')
-            return redirect('home.index')
+            return redirect('home/index.html')
 
     # If no matching destination found, proceed normally
-    return render(request, 'home.index', {'destination': dest_key})
+    return render(request, 'home/index.html', {'destination': dest_key})
 
 @login_required  # Ensures only logged-in users can access this
 def plan_trip(request):
@@ -146,7 +147,6 @@ def plan_trip(request):
                     new_activity = Activity(
                         name=activity.strip(),
                         trip=new_trip,
-
                     )
                     new_activity.save()
 
@@ -193,3 +193,5 @@ def edit_trip(request, trip_id):
         activity_formset = ActivityFormSet(instance=trip)
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items, 'activity_formset': activity_formset})
+
+

@@ -27,7 +27,6 @@
                                 <label for="id_end_date" class="form-label">End Date</label>
                                 {{ form.end_date|add_class:"form-control" }}
                             </div>
-
                             <!-- Weather -->
                             <div class="my-4 p-3 bg-light rounded">
                                 <h4 class="coiny-regular text-center">Weather</h4>
@@ -54,7 +53,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>                                  
                                     {% endfor %}
                                 </div>
                                 <button type="button" class="btn btn-success mt-3" id="add-activity">Add Activity</button>
@@ -108,16 +107,16 @@
                                         .map(input => input.value.trim())
                                         .filter(value => value !== '')
                                         .join(', ');
-
+                                    
                                     fetch('/ai/suggest-activities', {
                                         method: 'POST',
                                         headers: {
                                             'ContentType': 'application/json',
                                             'X-CSRFToken': '{{ csrf_token }}'
                                         },
-                                        body: new URLSearchParams({
-                                            location: tripDestination,
-                                            already_added: alreadyAddedActivities ? JSON.stringify(alreadyAddedActivities.split(', ')) : ''
+                                        body: new URLSearchParams({ 
+                                            location: tripDestination, 
+                                            already_added: alreadyAddedActivities ? JSON.stringify(alreadyAddedActivities.split(', ')) : '' 
                                         })
                                     })
                                         .then(response => {
@@ -194,6 +193,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Right Column - Packing List (Embedded from your existing page) -->
             <div class="col-lg-6">
                 <div class="card shadow-sm" style="min-height: 800px;">
