@@ -9,21 +9,21 @@ from django.templatetags.static import static
 @admin.register(inputTrip)
 class TripAdmin(admin.ModelAdmin):
     # List display configuration
-    list_display = ('destination_with_link', 'user', 'date_range', 'activities_preview', 'created_at')
+    list_display = ('destination_with_link', 'user', 'considerations', 'date_range', 'created_at')
     list_filter = (('start_date', DateFieldListFilter), ('end_date', DateFieldListFilter), 'user')
-    search_fields = ('destination', 'activities', 'user__username')
+    search_fields = ('destination', 'user__username')
     list_per_page = 25
     date_hierarchy = 'created_at'
 
     # Form display configuration
     fieldsets = (
         ('Trip Information', {
-            'fields': ('user', 'destination', ('start_date', 'end_date'))
+            'fields': ('user', 'destination', 'considerations', ('start_date', 'end_date'))
         }),
-        ('Activities', {
-            'fields': ('activities',),
-            'classes': ('wide', 'extrapretty'),
-        }),
+        # ('Activities', {
+        #     'fields': ('activities',),
+        #     'classes': ('wide', 'extrapretty'),
+        # }),
     )
 
     # Custom methods for list display
