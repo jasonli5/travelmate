@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from .models import Item, inputTrip  # Make sure to import inputTrip
 from django.views.decorators.http import require_POST
 from .api_utils import get_ai_suggestions
+from ai.models import Activity
+from ai.forms import ActivityFormSet
+from ai.api_utils import get_ai_additional_info
 
 
 @login_required
@@ -65,15 +68,19 @@ def delete_item(request, item_id):
 def ai_suggest_items(request):
     if request.method == "POST":
         location = request.POST.get("location")
-        days = int(request.POST.get("days", 3))
         count = int(request.POST.get("count", 6))
         trip_id = request.POST.get("trip_id")  # Get trip_id from request
         start_date = end_date = None;
+        activities = [];
+        considerations = "";
 
         if trip_id:
             trip = inputTrip.objects.get(id=trip_id)
             start_date = trip.start_date
             end_date = trip.end_date
+            activities = Activity.objects.filter(trip=trip).values_list('name', flat=True)
+            activities = list(activities)  # Convert to list
+            considerations = trip.considerations
 
         request.session["last_location"] = location
         existing_items = list(
@@ -85,6 +92,9 @@ def ai_suggest_items(request):
         print(f"Raw POST data: {request.POST}")
         print(f"Destination from form: {location}")
         print(f"Found trip: {trip.destination} ({start_date} to {end_date})")
+        print(f"Activities are: {activities}")
+        print(f"Considerations are: {considerations}")
+
 
         if trip_id:
             try:
@@ -92,7 +102,7 @@ def ai_suggest_items(request):
             except inputTrip.DoesNotExist:
                 print("Trip not found in database")
 
-        suggestions = get_ai_suggestions(location, start_date, end_date, count, existing_items)
+        suggestions = get_ai_suggestions(location, start_date, end_date, count, existing_items, activities, considerations)
         suggestions["trip_id"] = trip_id  # Include trip_id in response
         return JsonResponse(suggestions)
 

@@ -38,7 +38,7 @@ if API_KEY and is_api_key_valid(API_KEY):
     )
 
 
-def get_ai_suggestions(location, start, end, count, existing_items):
+def get_ai_suggestions(location, start, end, count, existing_items, activities, considerations):
     """Fetch packing suggestions from DeepSeek API"""
     if not client:
         return {
@@ -73,10 +73,22 @@ def get_ai_suggestions(location, start, end, count, existing_items):
     existing_names = [item["name"].lower() for item in existing_items]
     prompt = f"""
         Generate {count} essential packing items for a trip to {location} from the day {start} to end {end}.
+        TRIP DETAILS:
+        - Destination: {location}
+        - Weather: Weather from {start} to {end}
+        - Activities: {activities}
+        - Special Considerations: {considerations}
         
         IMPORTANT RULES:
         1. NEVER suggest these existing items: {', '.join(existing_names)}
         2. If suggesting similar items, make them meaningfully different
+        3. Prioritize items needed for these activities: {activities}
+        4. Account for these special considerations: {considerations}
+        
+        ITEM REQUIREMENTS:
+        - Must be essential for either the destination, duration, or planned activities
+        - Include weather-specific items when relevant
+        - Make distinct from existing items
         
         For each item, provide:
         - A short title
