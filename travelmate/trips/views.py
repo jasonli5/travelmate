@@ -88,7 +88,7 @@ def add_travel_recs(request):
                 destination=trip_data['destination'],
                 start_date=start_date,
                 end_date=end_date,
-                activities=trip_data['activities']
+                #activities=trip_data['activities']
             )
             # Generate additional info using AI
             info = get_ai_additional_info(new_trip.destination)
@@ -108,10 +108,10 @@ def add_travel_recs(request):
 
         except Exception as e:
             messages.error(request, f'Error creating trip: {str(e)}')
-            return redirect('home/index')
+            return redirect('home.index')
 
     # If no matching destination found, proceed normally
-    return render(request, 'home/index', {'destination': dest_key})
+    return render(request, 'home.index', {'destination': dest_key})
 
 @login_required  # Ensures only logged-in users can access this
 def plan_trip(request):
