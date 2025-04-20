@@ -17,6 +17,7 @@ from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
 
 
+
 PREDEFINED_TRIPS = {
     'paris': {
         'destination': 'Paris, France',
@@ -138,7 +139,7 @@ def plan_trip(request):
             if info:
                 new_trip.considerations = info
 
-            new_trip.save() # Save trip first
+            new_trip.save()  # Save trip first
 
 
             if request.POST['activities']:
@@ -149,7 +150,7 @@ def plan_trip(request):
                         trip=new_trip,
                     )
                     new_activity.save()
-            
+
             return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip
 
 
@@ -190,6 +191,10 @@ def edit_trip(request, trip_id):
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
+
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items})
+
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
 
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
