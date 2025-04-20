@@ -109,6 +109,7 @@ def add_travel_recs(request):
                         name=activity.strip(),
                         trip=new_trip,
 
+
                     )
                     new_activity.save()
             return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the trips list page
@@ -132,13 +133,15 @@ def plan_trip(request):
                 end_date=request.POST['end_date'],
                 # activities=request.POST['activities']
             )
+
             # Generate additional info using AI
             info = get_ai_additional_info(new_trip.destination)
 
             if info:
                 new_trip.considerations = info
 
-            new_trip.save()  # Save trip first
+
+            new_trip.save() # Save trip first
 
 
             if request.POST['activities']:
@@ -185,12 +188,9 @@ def edit_trip(request, trip_id):
         if form.is_valid() and activity_formset.is_valid():
             form.save()
             activity_formset.save()
-
             return redirect('trips')  # adjust this to match your trip list url name
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
-
-
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})

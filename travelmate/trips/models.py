@@ -9,12 +9,14 @@ class inputTrip(models.Model):
     destination = models.CharField("Chosen Destination", max_length=200)
     start_date = models.DateField("Start Date")
     end_date = models.DateField("End Date")
-    # activities = models.TextField("Desired Activities", max_length=500)
+
 
     # ✅ Add these new editable fields:
     weather = models.TextField("Weather Info", blank=True, null=True)
     packing_list = models.TextField("Packing List", blank=True, null=True)
+
     activities_list = models.TextField("Activities List", blank=True, null=True)
+
     considerations = models.JSONField("Additional Considerations", blank=True, null=True)
 
     def __str__(self):

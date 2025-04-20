@@ -7,7 +7,9 @@ class Activity(models.Model):
     """
     name = models.CharField(max_length=255)
 
+
     trip = models.ForeignKey(inputTrip, on_delete=models.CASCADE, related_name='activities')
+
 
 
     def __str__(self):
