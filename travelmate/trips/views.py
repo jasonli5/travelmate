@@ -139,7 +139,6 @@ def plan_trip(request):
                     new_activity = Activity(
                         name=activity.strip(),
                         trip=new_trip,
-                        is_ai_suggested=False
                     )
                     new_activity.save()
 
