@@ -194,4 +194,3 @@ def edit_trip(request, trip_id):
 
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
-

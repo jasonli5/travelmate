@@ -38,7 +38,6 @@ if API_KEY and is_api_key_valid(API_KEY):
     )
 
 
-
 def get_ai_suggestions(location, start, end, count, existing_items, activities, considerations):
     """Fetch packing suggestions from DeepSeek API"""
     if not client:
