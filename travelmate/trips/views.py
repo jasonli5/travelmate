@@ -93,7 +93,6 @@ def add_travel_recs(request):
                 destination=trip_data['destination'],
                 start_date=start_date,
                 end_date=end_date,
-
             )
 
 
@@ -192,9 +191,6 @@ def edit_trip(request, trip_id):
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
 
-    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items})
-
-    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
 
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
