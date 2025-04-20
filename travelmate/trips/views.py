@@ -131,7 +131,7 @@ def plan_trip(request):
             if info:
                 new_trip.considerations = info
 
-            new_trip.save() # Save trip first
+            new_trip.save()  # Save trip first
 
             if request.POST['activities']:
                 parsed_activities = request.POST['activities'].split(',')
@@ -143,7 +143,8 @@ def plan_trip(request):
                     )
                     new_activity.save()
 
-            return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip  # Redirect to a trips listing page, will need to change to planning page
+            return redirect('edit_trip',
+                            trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip  # Redirect to a trips listing page, will need to change to planning page
 
         except Exception as e:
             messages.error(request, f'Error saving your trip: {str(e)}')
@@ -182,10 +183,10 @@ def edit_trip(request, trip_id):
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
 
+
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'items': items, "ai_items" : ai_items})
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
-
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
 
