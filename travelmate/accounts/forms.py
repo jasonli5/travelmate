@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 
-
 class RegisterForm(UserCreationForm):
     username = forms.CharField(
         max_length=100,
@@ -54,10 +53,9 @@ class RegisterForm(UserCreationForm):
             raise ValidationError("This email address is already in use. Please use a different email or reset password on login page")
         return email
 
-class Meta:
-    model = User
-    fields = ["email", "username", "password1", "password2"]
-
+    class Meta:
+        model = User
+        fields = ["email", "username", "password1", "password2"]
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
@@ -87,3 +85,6 @@ class LoginForm(AuthenticationForm):
 class Meta:
     model = User
     fields = ["username", "password"]
+
+
+
