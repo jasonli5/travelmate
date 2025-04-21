@@ -4,12 +4,12 @@
 {% block content %}
 <div class="p-5 m-3">
     <div class="container">  <!-- Changed to container-fluid for full width -->
-        <div class="row my-4" id="edit-trip">  <!-- Removed justify-content-center -->
+        <div class="row my-4">  <!-- Removed justify-content-center -->
             <!-- Left Column - Trip Edit Form -->
             <div class="col-lg-6">
                 <div class="card shadow-sm" style="min-height: 800px;">
                     <div class="card-body">
-                        <h2 class="card-title text-center coiny-regular mb-4">Edit Trip: {{ trip.destination }}</h2>
+                        <h2 class="card-title text-center coiny-regular mt-2 mb-4">Edit Trip: {{ trip.destination }}</h2>
 
                         <form method="post">
                             {% csrf_token %}
