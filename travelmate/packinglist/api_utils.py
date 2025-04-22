@@ -38,45 +38,57 @@ if API_KEY and is_api_key_valid(API_KEY):
     )
 
 
-def get_ai_suggestions(location, month, count, existing_items):
+def get_ai_suggestions(location, start, end, count, existing_items, activities, considerations):
     """Fetch packing suggestions from DeepSeek API"""
     if not client:
         return {
             "suggestions": [
-                {
-                    "title": "Heavy Winter Coat",
-                    "description": "A thick, insulated coat to protect against Boston's cold December temperatures",
-                    "weather_consideration": "Essential for temperatures often below freezing",
-                },
-                {
-                    "title": "Warm Gloves and Scarf",
-                    "description": "Accessories to keep hands and neck warm in chilly weather",
-                    "weather_consideration": "Necessary to prevent frostbite and keep comfortable outdoors",
-                },
-                {
-                    "title": "Waterproof Boots",
-                    "description": "Boots designed to keep feet dry and warm during snow or rain",
-                    "weather_consideration": "Important for navigating snowy or wet sidewalks",
-                },
-                {
-                    "title": "Layered Clothing",
-                    "description": "Multiple layers of clothing to easily adjust to varying indoor and outdoor temperatures",
-                    "weather_consideration": "Allows for flexibility in Boston's unpredictable winter weather",
-                },
-                {
-                    "title": "Portable Umbrella",
-                    "description": "A compact umbrella for sudden rain or snow showers",
-                    "weather_consideration": "Useful for unexpected precipitation common in December",
-                },
-            ]
+        {
+            "title": "Travel Documents",
+            "description": "Passport, ID, tickets, and any necessary visas or permits"
+        },
+        {
+            "title": "Universal Power Adapter",
+            "description": "A compact adapter to charge devices in different countries"
+        },
+        {
+            "title": "First Aid Kit",
+            "description": "Basic medical supplies like bandages, pain relievers, and antiseptic"
+        },
+        {
+            "title": "Reusable Water Bottle",
+            "description": "Eco-friendly and convenient for staying hydrated"
+        },
+        {
+            "title": "Multi-Tool or Swiss Army Knife",
+            "description": "Handy for quick fixes, opening packages, or minor repairs"
+        },
+        {
+            "title": "Portable Charger",
+            "description": "Backup battery to keep phones and gadgets powered on the go"
+        }
+    ]
         }
     existing_names = [item["name"].lower() for item in existing_items]
     prompt = f"""
-        Generate {count} essential packing items for a trip to {location} in the month of {month}.
-        
+        Generate {count} essential packing items for a trip to {location} from the day {start} to end {end}.
+
+        TRIP DETAILS:
+        - Destination: {location}
+        - Weather: Weather from {start} to {end}
+        - Activities: {activities}
+        - Special Considerations: {considerations}
+
         IMPORTANT RULES:
         1. NEVER suggest these existing items: {', '.join(existing_names)}
         2. If suggesting similar items, make them meaningfully different
+        3. Prioritize items needed for these activities: {activities}
+        4. Account for these special considerations: {considerations}
+        
+        ITEM REQUIREMENTS:
+        - Must be essential for either the destination, duration, or planned activities
+        - Include weather-specific items when relevant
+        - Make distinct from existing items
         
         For each item, provide:
         - A short title

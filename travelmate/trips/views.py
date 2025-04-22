@@ -6,11 +6,16 @@ from ai.api_utils import get_ai_additional_info
 from .models import inputTrip, travelRecommendations
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
+from packinglist.models import Item
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import date, timedelta
 from django.utils import timezone
 from .forms import TripForm
+from ai.models import Activity
+from ai.forms import ActivityFormSet
+from ai.api_utils import get_ai_additional_info
+
 
 
 PREDEFINED_TRIPS = {
@@ -90,6 +95,7 @@ def add_travel_recs(request):
                 end_date=end_date,
             )
 
+
             # Generate additional info using AI
             info = get_ai_additional_info(new_trip.destination)
             if info:
@@ -102,6 +108,8 @@ def add_travel_recs(request):
                     new_activity = Activity(
                         name=activity.strip(),
                         trip=new_trip,
+
+
                     )
                     new_activity.save()
             return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the trips list page
@@ -132,7 +140,9 @@ def plan_trip(request):
             if info:
                 new_trip.considerations = info
 
+
             new_trip.save() # Save trip first
+
 
             if request.POST['activities']:
                 parsed_activities = request.POST['activities'].split(',')
@@ -142,8 +152,9 @@ def plan_trip(request):
                         trip=new_trip,
                     )
                     new_activity.save()
-            
+
             return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the edit page of the newly created trip
+
 
         except Exception as e:
             messages.error(request, f'Error saving your trip: {str(e)}')
@@ -167,7 +178,9 @@ def delete_trip(request, trip_id):
 @login_required
 def edit_trip(request, trip_id):
     trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
-    
+    all_items = Item.objects.filter(trip=trip_id)  # Add this line
+    items = all_items.filter(is_ai_suggested=False).order_by("id")
+    ai_items = all_items.filter(is_ai_suggested=True).order_by("id")
     if request.method == 'POST':
         form = TripForm(request.POST, instance=trip)
         activity_formset = ActivityFormSet(request.POST, instance=trip)
@@ -175,10 +188,9 @@ def edit_trip(request, trip_id):
         if form.is_valid() and activity_formset.is_valid():
             form.save()
             activity_formset.save()
-            messages.success(request, 'Trip updated successfully!')
             return redirect('trips')  # adjust this to match your trip list url name
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
-    
-    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset})
+
+    return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
