@@ -14,7 +14,7 @@ if not API_KEY:
     raise ValueError("API key not found in environment variables")
 
 # Constants
-FORECAST_DAYS = 7  # Standard OpenWeatherMap forecast limit (8-1)
+FORECAST_DAYS = 8  # Standard OpenWeatherMap forecast limit (8-1)
 HISTORICAL_YEARS = 5  # Number of years to look back for aggregation data
 MAX_FUTURE_DAYS = 365 * 1.5  # 1.5 years in future (practical limit)
 

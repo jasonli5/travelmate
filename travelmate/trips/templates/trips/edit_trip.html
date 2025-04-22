@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load form_tags %}
+{% load weather_filters %}
 {% block content %}
 <div class="p-5 m-3">
     <div class="container">  <!-- Changed to container-fluid for full width -->
@@ -31,16 +32,131 @@
                             <!-- Weather -->
 <!-- Weather -->
 <div class="my-4 p-3 bg-light rounded">
-    <h4 class="coiny-regular text-center">Weather</h4>
+    <h4 class="coiny-regular text-center">Weather Forecast</h4>
     <div class="d-flex justify-content-between align-items-center mb-2">
         <button type="button" class="btn btn-info" id="generate-weather">Generate Weather Forecast</button>
     </div>
+
     {% if trip.weather %}
-        <div class="weather-display mt-3 p-2 bg-white rounded">
-            <pre>{{ trip.weather }}</pre>
-            <!-- Add a hidden input to preserve the weather data -->
-            <input type="hidden" name="weather_data" value="{{ trip.weather }}">
+        {% with weather_data=trip.weather|json_decode %}
+        <div class="weather-display mt-3">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt"></i> {{ weather_data.location }}
+                    </h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="weatherDateDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Date
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="weatherDateDropdown">
+                            {% for report in weather_data.reports %}
+                            <li>
+                                <a class="dropdown-item weather-date-option" href="#" data-date="{{ report.date }}">
+                                    {{ report.date }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div id="weather-container">
+                        <!-- Default to showing the first report -->
+                        {% with report=weather_data.reports.0 %}
+                        <div class="weather-report active" id="weather-{{ report.date }}">
+                            <h5 class="text-center mb-3">{{ report.date }}</h5>
+                            <div class="weather-details">
+                                {% for line in report.report.splitlines %}
+                                    {% if line and "----" not in line %}
+                                        {% with parts=line|split:":" %}
+                                            {% if parts|length >= 2 %}
+                                                <div class="d-flex justify-content-between">
+                                                    <span>{{ parts.0 }}:</span>
+                                                    <span>{{ parts.1|slice:"1:"|trim }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endwith %}
+
+                        <!-- Hidden reports for other dates -->
+                        {% for report in weather_data.reports|slice:"1:" %}
+                        <div class="weather-report d-none" id="weather-{{ report.date }}">
+                            <h5 class="text-center mb-3">{{ report.date }}</h5>
+                            <div class="weather-details">
+                                {% for line in report.report.splitlines %}
+                                    {% if line and "----" not in line %}
+                                        {% with parts=line|split:":" %}
+                                            {% if parts|length >= 2 %}
+                                                <div class="d-flex justify-content-between">
+                                                    <span>{{ parts.0 }}:</span>
+                                                    <span>{{ parts.1|slice:"1:"|trim }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
+        {% endwith %}
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle date selection from dropdown
+            document.querySelectorAll('.weather-date-option').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const date = this.getAttribute('data-date');
+
+                    // Hide all weather reports
+                    document.querySelectorAll('.weather-report').forEach(report => {
+                        report.classList.add('d-none');
+                        report.classList.remove('active');
+                    });
+
+                    // Show selected report
+                    const selectedReport = document.getElementById(`weather-${date}`);
+                    if (selectedReport) {
+                        selectedReport.classList.remove('d-none');
+                        selectedReport.classList.add('active');
+                    }
+
+                    // Update dropdown button text
+                    document.getElementById('weatherDateDropdown').textContent = this.textContent.trim();
+                });
+            });
+        });
+        </script>
+
+        <style>
+            .weather-report {
+                transition: opacity 0.3s ease;
+            }
+            .weather-report.active {
+                opacity: 1;
+            }
+            .weather-details div {
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid #eee;
+            }
+            .weather-details div:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+        </style>
     {% else %}
         <div class="alert alert-info mt-3">No weather data available yet. Click the button above to generate forecast.</div>
     {% endif %}
