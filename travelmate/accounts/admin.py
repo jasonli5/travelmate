@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from .forms import RegisterForm
+from .forms import RegisterForm, CustomUserChangeForm
 
 #RegisterForm is serving as UserCreationForm to maintain email check logic
 
@@ -15,5 +15,13 @@ UserAdmin.add_fieldsets = (
     }),
 )
 
+UserAdmin.form = CustomUserChangeForm
+UserAdmin.fieldsets  = (
+    (None, {
+        'classes': ('wide',),
+        'fields': ('email', 'username', 'password')
+    }),
+)
+
 admin.site.unregister(User)
-admin.site.register(User, UserAdmin) #Registers new User Model with form!
+admin.site.register(User, UserAdmin)
