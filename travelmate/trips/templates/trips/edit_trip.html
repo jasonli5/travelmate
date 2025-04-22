@@ -29,10 +29,22 @@
                             </div>
 
                             <!-- Weather -->
-                            <div class="my-4 p-3 bg-light rounded">
-                                <h4 class="coiny-regular text-center">Weather</h4>
-                                <textarea name="weather" class="form-control mt-2">{{ trip.weather }}</textarea>
-                            </div>
+<!-- Weather -->
+<div class="my-4 p-3 bg-light rounded">
+    <h4 class="coiny-regular text-center">Weather</h4>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <button type="button" class="btn btn-info" id="generate-weather">Generate Weather Forecast</button>
+    </div>
+    {% if trip.weather %}
+        <div class="weather-display mt-3 p-2 bg-white rounded">
+            <pre>{{ trip.weather }}</pre>
+            <!-- Add a hidden input to preserve the weather data -->
+            <input type="hidden" name="weather_data" value="{{ trip.weather }}">
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-3">No weather data available yet. Click the button above to generate forecast.</div>
+    {% endif %}
+</div>
 
                             <!-- Activities -->
                             <div class="my-4 p-3 bg-light rounded text-center">
@@ -208,4 +220,40 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('generate-weather').addEventListener('click', function() {
+    const button = this;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+
+    fetch(`/trips/generate-weather/{{ trip.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to generate weather');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show the new weather data
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        button.disabled = false;
+        button.innerHTML = 'Generate Weather Forecast';
+    });
+});
+</script>
 {% endblock content %}

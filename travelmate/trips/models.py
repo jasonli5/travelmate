@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -21,6 +23,15 @@ class inputTrip(models.Model):
 
     def __str__(self):
         return f"{self.destination} ({self.start_date} to {self.end_date}) - #{self.id}"
+
+    @property
+    def weather_json(self):
+        if self.weather:
+            try:
+                return json.loads(self.weather)
+            except json.JSONDecodeError:
+                return None
+        return None
 
     class Meta:
         ordering = ['created_at']
