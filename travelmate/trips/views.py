@@ -16,8 +16,6 @@ from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
 
-
-
 PREDEFINED_TRIPS = {
     'paris': {
         'destination': 'Paris, France',

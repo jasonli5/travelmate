@@ -1,0 +1,14 @@
+{% autoescape off %}
+
+<h3>Hello, User {{ user.username }}</h3>
+
+<p>According to our records, your trip to {{trip.destination}} that is more than 3 days old. <p>   
+
+<p> If you still want to go on this trip, we urge you to log in and continue planning at the link below:</p>
+{{ protocol }}://{{ domain }}{% url 'edit_trip' trip_id=trip.id %}
+
+<p>If you are done planning the trip, please disregard this email and enjoy your travels.</p>
+
+<p>Sincerely,</p>
+<p>TravelMate Team</p>
+{% endautoescape %}
