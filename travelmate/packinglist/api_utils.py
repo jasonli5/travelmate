@@ -67,7 +67,9 @@ def get_ai_suggestions(location, start, end, count, existing_items, activities, 
             "title": "Portable Charger",
             "description": "Backup battery to keep phones and gadgets powered on the go"
         }
-    ]
+            ],
+            "used_default": True
+
         }
     existing_names = [item["name"].lower() for item in existing_items]
     prompt = f"""
@@ -84,6 +86,7 @@ def get_ai_suggestions(location, start, end, count, existing_items, activities, 
         2. If suggesting similar items, make them meaningfully different
         3. Prioritize items needed for these activities: {activities}
         4. Account for these special considerations: {considerations}
+        5. Make sure at least one of these items accounts for the weather during the time period of the trip ex: if the weather is normally snowy put a winter coat
         
         ITEM REQUIREMENTS:
         - Must be essential for either the destination, duration, or planned activities

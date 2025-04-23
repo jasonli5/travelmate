@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load form_tags %}
+{% load weather_filters %}
 {% block content %}
 <div class="p-5 m-3">
     <div class="container">  <!-- Changed to container-fluid for full width -->
@@ -29,10 +30,177 @@
                             </div>
 
                             <!-- Weather -->
-                            <div class="my-4 p-3 bg-light rounded">
-                                <h4 class="coiny-regular text-center">Weather</h4>
-                                <textarea name="weather" class="form-control mt-2">{{ trip.weather }}</textarea>
+<!-- Weather -->
+<div class="my-4 p-3 bg-light rounded">
+    <h4 class="coiny-regular text-center">Weather Forecast</h4>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <button type="button" class="btn btn-info" id="generate-weather">Generate Weather Forecast</button>
+    </div>
+
+    {% if trip.weather %}
+        {% with weather_data=trip.weather|json_decode %}
+        <div class="weather-display mt-3">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt"></i> {{ weather_data.location }}
+                    </h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="weatherDateDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Date
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="weatherDateDropdown">
+                            {% for report in weather_data.reports %}
+                            <li>
+                                <a class="dropdown-item weather-date-option" href="#" data-date="{{ report.date }}">
+                                    {{ report.date }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div id="weather-container">
+                        <!-- Default to showing the first report -->
+                        {% with report=weather_data.reports.0 %}
+                        <div class="weather-report active" id="weather-{{ report.date }}">
+                            <h5 class="text-center mb-3">{{ report.date }}</h5>
+                            <div class="weather-details">
+                                {% for line in report.report.splitlines %}
+                                    {% if line and "----" not in line %}
+                                        {% with parts=line|split:":" %}
+                                            {% if parts|length >= 2 %}
+                                                <div class="d-flex justify-content-between">
+                                                    <span>{{ parts.0 }}:</span>
+                                                    <span>{{ parts.1|slice:"1:"|trim }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endfor %}
                             </div>
+                        </div>
+                        {% endwith %}
+
+                        <!-- Hidden reports for other dates -->
+                        {% for report in weather_data.reports|slice:"1:" %}
+                        <div class="weather-report d-none" id="weather-{{ report.date }}">
+                            <h5 class="text-center mb-3">{{ report.date }}</h5>
+                            <div class="weather-details">
+                                {% for line in report.report.splitlines %}
+                                    {% if line and "----" not in line %}
+                                        {% with parts=line|split:":" %}
+                                            {% if parts|length >= 2 %}
+                                                <div class="d-flex justify-content-between">
+                                                    <span>{{ parts.0 }}:</span>
+                                                    <span>{{ parts.1|slice:"1:"|trim }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Temperature Summary Section -->
+<div class="temperature-summary mt-4 p-3 bg-light rounded">
+    <h5 class="text-center mb-3">Temperature Extremes</h5>
+    <div class="row text-center">
+        <div class="col-md-6">
+            <div class="card bg-danger bg-opacity-10">
+                <div class="card-body">
+                    <h6><i class="fas fa-temperature-high"></i> Highest Temp</h6>
+                    <p class="display-6">{{ weather_data.reports|get_max_temp }}°C</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-primary bg-opacity-10">
+                <div class="card-body">
+                    <h6><i class="fas fa-temperature-low"></i> Lowest Temp</h6>
+                    <p class="display-6">{{ weather_data.reports|get_min_temp }}°C</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="conditions-visualization mt-4 pb-3">
+    <h5 class="text-center mb-3">Daily Weather Conditions</h5>
+    <div class="d-flex flex-wrap justify-content-center gap-3 pb-1">
+        {% for report in weather_data.reports %}
+            {% with condition_code=report.report|get_condition_code %}
+            <div class="condition-icon text-center mb-2" data-bs-toggle="tooltip"
+                 title="{{ report.date }}: {{ report.report|get_condition_text }}">
+                <img src="https://openweathermap.org/img/wn/{{ condition_code }}@2x.png"
+                     alt="{{ report.report|get_condition_text }}"
+                     class="img-fluid"
+                     style="height: 50px; width: 50px;">
+                <div class="small mt-1">{{ report.date|slice:"5:" }}</div>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+<!-- END OF NEW SECTION -->
+            </div>
+        </div>
+        {% endwith %}
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle date selection from dropdown
+            document.querySelectorAll('.weather-date-option').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const date = this.getAttribute('data-date');
+
+                    // Hide all weather reports
+                    document.querySelectorAll('.weather-report').forEach(report => {
+                        report.classList.add('d-none');
+                        report.classList.remove('active');
+                    });
+
+                    // Show selected report
+                    const selectedReport = document.getElementById(`weather-${date}`);
+                    if (selectedReport) {
+                        selectedReport.classList.remove('d-none');
+                        selectedReport.classList.add('active');
+                    }
+
+                    // Update dropdown button text
+                    document.getElementById('weatherDateDropdown').textContent = this.textContent.trim();
+                });
+            });
+        });
+        </script>
+
+        <style>
+            .weather-report {
+                transition: opacity 0.3s ease;
+            }
+            .weather-report.active {
+                opacity: 1;
+            }
+            .weather-details div {
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid #eee;
+            }
+            .weather-details div:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+        </style>
+    {% else %}
+        <div class="alert alert-info mt-3">No weather data available yet. Click the button above to generate forecast.</div>
+    {% endif %}
+</div>
 
                             <!-- Activities -->
                             <div class="my-4 p-3 bg-light rounded text-center">
@@ -208,4 +376,40 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('generate-weather').addEventListener('click', function() {
+    const button = this;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+
+    fetch(`/trips/generate-weather/{{ trip.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to generate weather');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show the new weather data
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        button.disabled = false;
+        button.innerHTML = 'Generate Weather Forecast';
+    });
+});
+</script>
 {% endblock content %}

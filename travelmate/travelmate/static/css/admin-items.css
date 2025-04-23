@@ -1,0 +1,29 @@
+/* Trip info styling */
+.trip-info {
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.trip-info .destination {
+    font-weight: 500;
+    display: inline-block;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trip-info small {
+    display: block;
+    color: #666;
+}
+
+.trip-info .user {
+    font-style: italic;
+}
+
+/* Make the table cells a bit taller to accommodate the info */
+#result_list td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    vertical-align: middle;
+}

@@ -9,7 +9,7 @@ class TripFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         # Get all unique trips that have items
         trips = inputTrip.objects.filter(items__isnull=False).distinct()
-        return [(trip.id, f"{trip.destination} ({trip.start_date} to {trip.end_date})") for trip in trips]
+        return [(trip.id, f"{trip.destination}:[{trip.user}] - ({trip.start_date} to {trip.end_date})") for trip in trips]
 
     def queryset(self, request, queryset):
         if self.value():
@@ -39,7 +39,7 @@ class ItemAdmin(admin.ModelAdmin):
     # Custom method to display trip info
     def trip_info(self, obj):
         if obj.trip:
-            return f"{obj.trip.destination} ({obj.trip.start_date} to {obj.trip.end_date})"
+            return f"{obj.trip.destination} - ({obj.trip.start_date} to {obj.trip.end_date})"
         return "No trip"
 
     trip_info.short_description = 'Trip'

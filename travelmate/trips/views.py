@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.http import JsonResponse
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
@@ -15,6 +15,12 @@ from .forms import TripForm
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
+from django.shortcuts import get_object_or_404
+from datetime import datetime, timedelta
+from .models import inputTrip
+from weather_data.api_utils import get_coordinates, get_date_range_weather
+import json
+
 
 
 
@@ -59,16 +65,41 @@ def trip_draft(request):
     template_data['dates'] = str(trip.start_date) + " - " + str(trip.end_date)
     template_data['activities'] = trip.activites.split(",")
     return render(request, 'trips/edit_trip.html', {'template_data' : template_data})
-def edit_trip(request):
-    template_data= {}
-    template_data['title'] = 'Editing New Trip'
-    trip = inputTrip.objects.filter(user=request.user).first()
 
-    template_data['destination'] = trip.destination
-    template_data['dates'] = str(trip.start_date) + " - " + str(trip.end_date)
-    template_data['activities'] = trip.activites.split(",")
 
-    return render(request, 'trips/edit_trip.html', {'template_data' : template_data})
+@login_required
+def edit_trip(request, trip_id):
+    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+    all_items = Item.objects.filter(trip=trip_id)
+    items = all_items.filter(is_ai_suggested=False).order_by("id")
+    ai_items = all_items.filter(is_ai_suggested=True).order_by("id")
+
+    if request.method == 'POST':
+        form = TripForm(request.POST, instance=trip)
+        activity_formset = ActivityFormSet(request.POST, instance=trip)
+
+        if form.is_valid() and activity_formset.is_valid():
+            # Save the form without committing to database
+            trip = form.save(commit=False)
+            # Preserve the existing weather data
+            original_trip = inputTrip.objects.get(id=trip_id)
+            trip.weather = original_trip.weather
+            # Now save to database
+            trip.save()
+
+            activity_formset.save()
+            return redirect('trips')
+    else:
+        form = TripForm(instance=trip)
+        activity_formset = ActivityFormSet(instance=trip)
+
+    return render(request, 'trips/edit_trip.html', {
+        'form': form,
+        'trip': trip,
+        'activity_formset': activity_formset,
+        'items': items,
+        "ai_items": ai_items
+    })
 
 def travel_recs(request):
     recs = travelRecommendations.objects.all()
@@ -194,3 +225,65 @@ def edit_trip(request, trip_id):
         activity_formset = ActivityFormSet(instance=trip)
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
+
+
+def generate_trip_weather(trip_id):
+    """
+    Generate weather forecast for all dates in a trip and save to the trip model
+    """
+    # Get the trip object
+    trip = get_object_or_404(inputTrip, id=trip_id)
+
+    # Convert dates to datetime objects
+    start_date = datetime.combine(trip.start_date, datetime.min.time())
+    end_date = datetime.combine(trip.end_date, datetime.min.time())
+
+    try:
+        # Get coordinates for the destination
+        coords = get_coordinates(trip.destination)
+        location_name = coords['name']
+
+        # Get weather for the entire trip duration
+        weather_reports = get_date_range_weather(
+            coords['lat'],
+            coords['lon'],
+            location_name,
+            start_date,
+            end_date
+        )
+
+        # Combine all weather reports into a single JSON-serializable structure
+        weather_data = {
+            'location': location_name,
+            'coordinates': {
+                'lat': coords['lat'],
+                'lon': coords['lon']
+            },
+            'reports': []
+        }
+
+        current_date = start_date
+        for report in weather_reports:
+            weather_data['reports'].append({
+                'date': current_date.strftime('%Y-%m-%d'),
+                'report': report.strip()  # Remove extra whitespace
+            })
+            current_date += timedelta(days=1)
+
+        # Save to the trip model
+        trip.weather = json.dumps(weather_data, indent=2)
+        trip.save()
+
+        return True, "Weather data generated successfully"
+
+    except Exception as e:
+        print(start_date)
+        print(end_date)
+        return False, f"Error generating weather data: {str(e)}"
+
+@login_required
+def generate_weather_view(request, trip_id):
+    if request.method == 'POST':
+        success, message = generate_trip_weather(trip_id)
+        return JsonResponse({'success': success, 'message': message})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
