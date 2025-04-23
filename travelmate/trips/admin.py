@@ -124,6 +124,7 @@ class TripAdmin(admin.ModelAdmin):
     weather_prettified.short_description = 'Weather Forecast'
     weather_prettified.allow_tags = True
 
+
     # Add this to your Media class
     class Media:
         css = {
