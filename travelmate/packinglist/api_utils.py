@@ -67,7 +67,9 @@ def get_ai_suggestions(location, start, end, count, existing_items, activities, 
             "title": "Portable Charger",
             "description": "Backup battery to keep phones and gadgets powered on the go"
         }
-    ]
+            ],
+            "used_default": True
+
         }
     existing_names = [item["name"].lower() for item in existing_items]
     prompt = f"""
