@@ -312,13 +312,13 @@ def format_weather_output(weather_data, location_name, is_prediction=False):
         data = weather_data
         output_date = datetime.fromtimestamp(data['dt']).strftime('%a, %b %d %Y')
 
-    # Handle different temperature structures
+    # Handle different temperature structures with 1 decimal place
     if 'temp' in data and isinstance(data['temp'], dict):
-        temp = data['temp']['day']
-        feels_like = data['feels_like']['day']
+        temp = f"{data['temp']['day']:.1f}" if isinstance(data['temp']['day'], float) else data['temp']['day']
+        feels_like = f"{data['feels_like']['day']:.1f}" if isinstance(data['feels_like']['day'], float) else data['feels_like']['day']
     else:
-        temp = data.get('temp', 'N/A')
-        feels_like = data.get('feels_like', 'N/A')
+        temp = f"{data.get('temp', 'N/A'):.1f}" if isinstance(data.get('temp'), float) else data.get('temp', 'N/A')
+        feels_like = f"{data.get('feels_like', 'N/A'):.1f}" if isinstance(data.get('feels_like'), float) else data.get('feels_like', 'N/A')
 
     prediction_note = "\nNote: This is a prediction based on historical weather patterns" if is_prediction else ""
 

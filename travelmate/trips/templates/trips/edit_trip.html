@@ -107,6 +107,46 @@
                         {% endfor %}
                     </div>
                 </div>
+                <!-- Temperature Summary Section -->
+<div class="temperature-summary mt-4 p-3 bg-light rounded">
+    <h5 class="text-center mb-3">Temperature Extremes</h5>
+    <div class="row text-center">
+        <div class="col-md-6">
+            <div class="card bg-danger bg-opacity-10">
+                <div class="card-body">
+                    <h6><i class="fas fa-temperature-high"></i> Highest Temp</h6>
+                    <p class="display-6">{{ weather_data.reports|get_max_temp }}°C</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-primary bg-opacity-10">
+                <div class="card-body">
+                    <h6><i class="fas fa-temperature-low"></i> Lowest Temp</h6>
+                    <p class="display-6">{{ weather_data.reports|get_min_temp }}°C</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="conditions-visualization mt-4 pb-3">
+    <h5 class="text-center mb-3">Daily Weather Conditions</h5>
+    <div class="d-flex flex-wrap justify-content-center gap-3 pb-1">
+        {% for report in weather_data.reports %}
+            {% with condition_code=report.report|get_condition_code %}
+            <div class="condition-icon text-center mb-2" data-bs-toggle="tooltip"
+                 title="{{ report.date }}: {{ report.report|get_condition_text }}">
+                <img src="https://openweathermap.org/img/wn/{{ condition_code }}@2x.png"
+                     alt="{{ report.report|get_condition_text }}"
+                     class="img-fluid"
+                     style="height: 50px; width: 50px;">
+                <div class="small mt-1">{{ report.date|slice:"5:" }}</div>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+<!-- END OF NEW SECTION -->
             </div>
         </div>
         {% endwith %}
