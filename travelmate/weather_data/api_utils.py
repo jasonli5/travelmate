@@ -361,7 +361,7 @@ def get_date_range_weather(lat, lon, location_name, start_date, end_date):
     # Otherwise go day by day
     while current_date <= end_date:
         try:
-            if current_date > now + timedelta(days=FORECAST_DAYS):
+            if current_date > now + timedelta(days=FORECAST_DAYS-1):
                 # Beyond forecast window - use historical aggregation
                 weather = get_historical_aggregation(lat, lon, current_date)
                 results.append(format_weather_output(weather, location_name, is_prediction=True))
