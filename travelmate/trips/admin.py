@@ -68,11 +68,72 @@ class TripAdmin(admin.ModelAdmin):
             return ('created_at', 'weather_prettified')
         return ()
 
-    # Optional: Add custom CSS
+    def weather_prettified(self, obj):
+        if not obj.weather:
+            return "No weather data available"
+
+        try:
+            weather_data = json.loads(obj.weather)
+            location = weather_data.get('location', 'Unknown location')
+            reports = weather_data.get('reports', [])
+
+            if not reports:
+                return format_html('<div class="alert alert-info">No weather reports available</div>')
+
+            html = f"""
+            <div class="weather-admin-container">
+                <h4>{location}</h4>
+                <div class="weather-reports">
+            """
+
+            for report in reports:
+                date = report.get('date', 'Unknown date')
+                report_text = report.get('report', 'No data')
+
+                # Format the report text with HTML
+                formatted_report = []
+                for line in report_text.splitlines():
+                    if ":" in line:
+                        key, value = line.split(":", 1)
+                        formatted_report.append(f"""
+                            <div class="weather-line">
+                                <span class="weather-key">{key}:</span>
+                                <span class="weather-value">{value.strip()}</span>
+                            </div>
+                        """)
+
+                html += f"""
+                <div class="weather-report-card">
+                    <h5>{date}</h5>
+                    <div class="weather-details">
+                        {''.join(formatted_report)}
+                    </div>
+                </div>
+                """
+
+            html += """
+                </div>
+            </div>
+            """
+
+            return format_html(html)
+
+        except json.JSONDecodeError:
+            return format_html('<div class="alert alert-danger">Invalid weather data format</div>')
+
+    weather_prettified.short_description = 'Weather Forecast'
+    weather_prettified.allow_tags = True
+
+    # Add this to your Media class
     class Media:
         css = {
-            'all': ('css/admin-trips.css',)
+            'all': [
+                'css/admin-trips.css',
+            ]
         }
+        js = (
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js',
+        )
 
 @admin.register(travelRecommendations)
 class travelRecommendationsAdmin(admin.ModelAdmin):
