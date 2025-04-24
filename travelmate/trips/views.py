@@ -20,42 +20,11 @@ from datetime import datetime, timedelta
 from .models import inputTrip
 from weather_data.api_utils import get_coordinates, get_date_range_weather
 import json
+from .admin import load_predefined_trips
 
 
 
 
-PREDEFINED_TRIPS = {
-    'paris': {
-        'destination': 'Paris, France',
-        'activities': 'Visit Eiffel Tower, Try a baguette, Watch a mime, Cruise the Seine',
-        'duration': 7
-    },
-    'tokyo': {
-        'destination': 'Tokyo, Japan',
-        'activities': 'Visit Shibuya Crossing, Try sushi, See cherry blossoms, Explore Akihabara',
-        'duration': 7
-    },
-    'new york city': {
-        'destination': 'New York City, USA',
-        'activities': 'See Times Square, Visit Statue of Liberty, Walk in Central Park, See a Broadway show',
-        'duration': 7
-    },
-    'barcelona': {
-        'destination': 'Barcelona, Spain',
-        'activities': 'Visit Sagrada Familia, Walk Las Ramblas, Try paella, Explore Park Güell',
-        'duration': 7
-    },
-    'maui': {
-        'destination': 'Maui, Hawaii',
-        'activities': 'Road to Hana, Snorkel at Molokini, Watch sunrise at Haleakalā, Attend a luau',
-        'duration': 7
-    },
-    'aspen': {
-        'destination': 'Aspen, Colorado',
-        'activities': 'Skiing/snowboarding, Visit Maroon Bells, Explore downtown Aspen, Relax at hot springs',
-        'duration': 7
-    }
-}
 # Create your views here.
 def trip_draft(request):
     template_data= {}
@@ -105,14 +74,18 @@ def travel_recs(request):
     recs = travelRecommendations.objects.all()
     return render(request, 'travelrecs/recs.html', {'recs': recs})
 
+
 @login_required
 def add_travel_recs(request):
     # Get and clean the destination parameter
     dest_key = request.GET.get('destination', '').strip().lower()
 
+    # Load trips from JSON file
+    predefined_trips = load_predefined_trips()
+
     # Check if it's one of our predefined destinations
-    if dest_key in PREDEFINED_TRIPS:
-        trip_data = PREDEFINED_TRIPS[dest_key]
+    if dest_key in predefined_trips:
+        trip_data = predefined_trips[dest_key]
         try:
             # Calculate dates
             start_date = timezone.now().date()
@@ -126,7 +99,6 @@ def add_travel_recs(request):
                 end_date=end_date,
             )
 
-
             # Generate additional info using AI
             info = get_ai_additional_info(new_trip.destination)
             if info:
@@ -139,11 +111,9 @@ def add_travel_recs(request):
                     new_activity = Activity(
                         name=activity.strip(),
                         trip=new_trip,
-
-
                     )
                     new_activity.save()
-            return redirect('edit_trip', trip_id=new_trip.id)  # Redirect to the trips list page
+            return redirect('edit_trip', trip_id=new_trip.id)
 
         except Exception as e:
             messages.error(request, f'Error creating trip: {str(e)}')
