@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="content">
+    <h1>Edit Predefined Trip: {{ predefined_data.destination }}</h1>
+    <p><strong>Key:</strong> {{ predefined_key }} (used for matching)</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="field-box">
+                <label>Destination:</label>
+                <input type="text" name="destination" value="{{ predefined_data.destination }}" style="width: 100%">
+                <p class="help">Full destination name (e.g., "Aspen, Colorado")</p>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field-box">
+                <label>Activities:</label>
+                <textarea name="activities" rows="5" style="width: 100%">{{ predefined_data.activities }}</textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field-box">
+                <label>Duration (days):</label>
+                <input type="number" name="duration" value="{{ predefined_data.duration }}">
+            </div>
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default">
+            <a href="../" class="button">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

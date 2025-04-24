@@ -22,7 +22,7 @@ class inputTrip(models.Model):
     considerations = models.JSONField("Additional Considerations", blank=True, null=True)
 
     def __str__(self):
-        return f"{self.destination} ({self.start_date} to {self.end_date}) - #{self.id}"
+        return f"{self.destination}: [{self.user}] - ({self.start_date} to {self.end_date}) - #{self.id}"
 
     class Meta:
         ordering = ['created_at']

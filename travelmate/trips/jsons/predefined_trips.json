@@ -1,0 +1,32 @@
+{
+  "paris": {
+    "destination": "Paris, France",
+    "activities": "Visit Eiffel Tower, Try a baguette, Watch a mime, Cruise the Seine",
+    "duration": 7
+  },
+  "tokyo": {
+    "destination": "Tokyo, Japan",
+    "activities": "Visit Shibuya Crossing, Try sushi, See cherry blossoms, Explore Akihabara",
+    "duration": 7
+  },
+  "new york city": {
+    "destination": "New York City, USA",
+    "activities": "See Times Square, Visit Statue of Liberty, Walk in Central Park, See a Broadway show",
+    "duration": 7
+  },
+  "barcelona": {
+    "destination": "Barcelona, Spain",
+    "activities": "Visit Sagrada Familia, Walk Las Ramblas, Try paella, Explore Park G\u00fcell",
+    "duration": 7
+  },
+  "maui": {
+    "destination": "Maui, Hawaii",
+    "activities": "Road to Hana, Snorkel at Molokini, Watch sunrise at Haleakal\u0101, Attend a luau",
+    "duration": 7
+  },
+  "aspen": {
+    "destination": "Aspen, Colorado",
+    "activities": "Skiing/snowboarding, Visit Maroon Bells, Explore downtown Aspen, Relax at hot springs",
+    "duration": 7
+  }
+}
