@@ -143,3 +143,6 @@ EMAIL_HOST_PASSWORD = 'cogi bxzw ixsz izhm'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#Settings for reminder email background tasks
+BACKGROUND_TASK_RUN_ASYNC = True

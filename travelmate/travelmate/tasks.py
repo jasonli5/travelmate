@@ -1,4 +1,4 @@
-from background_task import background
+from background_task import background, Task
 from django.contrib.auth.models import User
 from trips.models import inputTrip
 from datetime import date, timedelta
@@ -16,7 +16,7 @@ def get_recipients():
 
 #background task syntax, added params for message and trip
 @background(schedule=60)
-def notify_user(user_id, trip, message):
+def notify_user(user_id, message):
     user = User.objects.get(pk=user_id)
     user.email_user("TravelMate Reminder: Complete your Trip", message)
 
@@ -25,4 +25,4 @@ remind_users = get_recipients() #creating list of tuples
 #calling notify_user for each user to be reminded about specified old trip
 for (user, trip) in remind_users:
     msg = render_to_string("reminder.html",{'user': user, 'trip': trip})
-    notify_user(user.id, trip, msg, repeat=30, repeat_until=date(2025,5,2))
+    notify_user(user.id, msg, repeat=Task.DAILY, repeat_until=date(2025,5,2))

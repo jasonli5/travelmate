@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
