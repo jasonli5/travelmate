@@ -305,7 +305,7 @@ def export_trip_pdf(request, trip_id):
     trip = get_object_or_404(inputTrip, pk=trip_id)
 
     weather_data = json.loads(trip.weather) if trip.weather else {}
-    activities = json.loads(trip.activities_list) if trip.activities_list else []
+    activities = Activity.objects.filter(trip=trip).values_list('name', flat=True)
     all_items = Item.objects.filter(trip=trip)
     packing_items = all_items.filter(is_ai_suggested=False).order_by("id")
     considerations = trip.considerations if isinstance(trip.considerations, list) else json.loads(trip.considerations) if trip.considerations else []
