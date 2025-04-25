@@ -306,7 +306,8 @@ def export_trip_pdf(request, trip_id):
 
     weather_data = json.loads(trip.weather) if trip.weather else {}
     activities = json.loads(trip.activities_list) if trip.activities_list else []
-    packing_items = json.loads(trip.packing_list) if trip.packing_list else []
+    all_items = Item.objects.filter(trip=trip)
+    packing_items = all_items.filter(is_ai_suggested=False).order_by("id")
     considerations = trip.considerations if isinstance(trip.considerations, list) else json.loads(trip.considerations) if trip.considerations else []
 
     template = get_template('trips/trip_pdf_template.html')
