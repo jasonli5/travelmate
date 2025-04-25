@@ -23,14 +23,12 @@
     </ul>
   {% endif %}
 
+    <h2>Packing List</h2>
     {% if packing_items %}
     <div class="packing-section">
-      <h2 class="section-title">Packing List</h2>
-      <ul class="item-list">
+      <ul>
         {% for item in packing_items %}
-          <li> {{ item.name }}</li>
-        {% empty %}
-          <li>No items added yet</li>
+          <li>{{ item.name }}</li>
         {% endfor %}
       </ul>
     </div>
