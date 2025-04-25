@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import export_trip_pdf
 
 
 
@@ -14,4 +15,5 @@ urlpatterns = [
     path('trips/delete/<int:trip_id>/', views.delete_trip, name='delete_trip'),
     path('<int:trip_id>/edit/', views.edit_trip, name='edit_trip'),
     path('generate-weather/<int:trip_id>/', views.generate_weather_view, name='generate_weather'),
+    path('trip/<int:trip_id>/pdf/', export_trip_pdf, name='export_trip_pdf'),
 ]

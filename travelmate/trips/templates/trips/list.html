@@ -36,6 +36,12 @@
             >
               <i class="fas fa-edit me-1"></i> Edit
             </a>
+            <a
+              href="{% url 'export_trip_pdf' trip.id %}"
+              class="btn btn-sm btn-outline-success mt-1"
+            >
+            <i class="fas fa-file-pdf me-1"></i> Export as PDF
+            </a>
           </div>
           <div
             class="trip-activities mt-2"
