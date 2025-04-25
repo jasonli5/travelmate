@@ -213,6 +213,21 @@
         </div>
     </div>
 </div>
+<!-- Centered Toast Notification -->
+<div class="position-fixed top-50 start-50 translate-middle p-3" style="z-index: 1100; width: 400px;">
+    <div id="apiFailToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-warning text-white">
+            <strong class="me-auto fs-5">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Warning
+            </strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body fs-5 p-4">
+            <div id="toastMessage">API unavailable - showing default suggestions</div>
+        </div>
+    </div>
+</div>
 
 {% block scripts %}
 <script>
@@ -245,7 +260,7 @@ function getAISuggestions() {
     const btn = document.getElementById('aiSuggestBtn');
     const container = document.getElementById('aiSuggestions');
     const loader = document.getElementById('aiLoading');
-    const tripId = "{{ trip.id }}";  // Get current trip ID from template
+    const tripId = "{{ trip.id }}";
 
     btn.disabled = true;
     btn.classList.remove('btn-success');
@@ -259,7 +274,7 @@ function getAISuggestions() {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-CSRFToken': '{{ csrf_token }}'
         },
-        body: `location=${encodeURIComponent(location)}&trip_id=${tripId}`  // Send trip_id to server
+        body: `location=${encodeURIComponent(location)}&trip_id=${tripId}`
     })
     .then(response => response.json())
     .then(data => {
@@ -267,6 +282,12 @@ function getAISuggestions() {
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-success');
         loader.style.display = 'none';
+
+        // Show toast if defaults were used
+        if (data.used_default) {
+            const toast = new bootstrap.Toast(document.getElementById('apiFailToast'));
+            toast.show();
+        }
 
         if (data.suggestions?.length > 0) {
             data.suggestions.forEach((item) => {
@@ -276,7 +297,7 @@ function getAISuggestions() {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-CSRFToken': '{{ csrf_token }}'
                     },
-                    body: `name=${encodeURIComponent(item.title)}&description=${encodeURIComponent(item.description || '')}&is_ai_suggested=True&trip_id=${tripId}`  // Include trip_id
+                    body: `name=${encodeURIComponent(item.title)}&description=${encodeURIComponent(item.description || '')}&is_ai_suggested=True&trip_id=${tripId}`
                 });
             });
 
@@ -304,10 +325,16 @@ function getAISuggestions() {
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-success');
         loader.style.display = 'none';
-        container.innerHTML = `
-            <div class="alert alert-danger">
-                Error loading suggestions. Try again.
-            </div>`;
+
+        // Show error toast
+        const toastEl = document.getElementById('apiFailToast');
+        toastEl.querySelector('.toast-body').innerHTML = `
+            <i class="bi bi-exclamation-octagon-fill me-2"></i>
+            Error loading suggestions. Try again.
+        `;
+        toastEl.querySelector('.toast-header').classList.replace('bg-warning', 'bg-danger');
+        new bootstrap.Toast(toastEl).show();
+
         console.error('Error:', error);
     });
 }
