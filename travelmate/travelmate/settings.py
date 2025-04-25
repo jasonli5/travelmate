@@ -131,7 +131,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'travelmate/static/',
 ]
 
-#email settings for reset password
+#email settings for reset password and invite collaborators
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True

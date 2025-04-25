@@ -372,6 +372,28 @@
                 <div class="card shadow-sm" style="min-height: 800px;">
                 {% include 'packinglist/packing_list.html' with trip=trip items=items %}
                 </div>
+
+                <!-- Collaborators Invite Form  -->
+                <div class="collaboration-section my-4 p-3 bg-light rounded">
+                    <h4 class="coiny-regular text-center">Collaborate on This Trip</h4>
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+                    <form method="POST" action="{% url 'invite_collaborator' trip.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ collab_form.email.label_tag }}
+                            {{ collab_form.email|add_class:"form-control" }}
+                            {% if collab_form.email.errors %}
+                            <div class="text-danger">{{ collab_form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary mt-3">Send Invitation</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -1,8 +1,16 @@
+import smtplib
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
 from django.shortcuts import render
 from django.http import JsonResponse
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
+from django.template.loader import render_to_string
+
 from .models import inputTrip, travelRecommendations
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
@@ -11,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import date, timedelta
 from django.utils import timezone
-from .forms import TripForm
+from .forms import TripForm, CollabInviteForm
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
@@ -46,6 +54,7 @@ def edit_trip(request, trip_id):
     if request.method == 'POST':
         form = TripForm(request.POST, instance=trip)
         activity_formset = ActivityFormSet(request.POST, instance=trip)
+        collab_form = CollabInviteForm(request.POST, user=request.user)
 
         if form.is_valid() and activity_formset.is_valid():
             # Save the form without committing to database
@@ -57,17 +66,30 @@ def edit_trip(request, trip_id):
             trip.save()
 
             activity_formset.save()
+
+            # If the collaborator invite form is valid, send the invitation email
+            email = collab_form.cleaned_data['email']
+            send_mail(
+                'Trip Collaboration Invitation',
+                f'You have been invited to collaborate on the trip to {trip.destination}. Please log in to accept the invitation.',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+
             return redirect('trips')
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
+        collab_form = CollabInviteForm(user=request.user)
 
     return render(request, 'trips/edit_trip.html', {
         'form': form,
         'trip': trip,
         'activity_formset': activity_formset,
         'items': items,
-        "ai_items": ai_items
+        "ai_items": ai_items,
+        'collab_form': collab_form,
     })
 
 def travel_recs(request):
@@ -175,7 +197,7 @@ def delete_trip(request, trip_id):
     else:
         # If someone tries to access this URL directly via GET, redirect them
         return redirect('trips')
-
+'''
 @login_required
 def edit_trip(request, trip_id):
     trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
@@ -195,7 +217,7 @@ def edit_trip(request, trip_id):
         activity_formset = ActivityFormSet(instance=trip)
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
-
+'''
 
 def generate_trip_weather(trip_id):
     """
@@ -257,3 +279,56 @@ def generate_weather_view(request, trip_id):
         success, message = generate_trip_weather(trip_id)
         return JsonResponse({'success': success, 'message': message})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+@login_required
+def invite_collaborator(request, trip_id):
+    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+
+    if request.method == 'POST':
+        form = CollabInviteForm(request.POST, user=request.user)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                context = {
+                    'destination': trip.destination,
+                    'start_date': trip.start_date,
+                    'end_date': trip.end_date,
+                    'inviter': request.user.get_full_name() or request.user.username,
+                    'signup_url': request.build_absolute_uri('/accounts/signup'),
+                    'site_name': 'TravelMate',
+                    'email': email,
+                    'user': request.user,
+                }
+
+                subject = render_to_string(
+                    'trips/collabinvite/collab_invite_subject.txt',
+                    context
+                ).strip()
+
+                subject = ''.join(subject.splitlines())
+
+                message = render_to_string(
+                    'trips/collabinvite/collab_invite_email.txt',
+                    context
+                )
+
+                from django.core.mail import EmailMultiAlternatives
+                email_message = EmailMultiAlternatives(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    headers={'Reply-To': settings.DEFAULT_FROM_EMAIL},
+                )
+                email_message.send(fail_silently=False)
+
+                messages.success(request, f'Invitation sent to {email}!')
+                return redirect('edit_trip', trip_id=trip.id)
+
+            except Exception as e:
+                messages.error(request, 'Failed to send invitation')
+                if settings.DEBUG:
+                    print(f"Email error: {str(e)}")
+                return redirect('edit_trip', trip_id=trip.id)
+
+    return redirect('edit_trip', trip_id=trip.id)

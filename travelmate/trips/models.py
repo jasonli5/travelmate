@@ -11,6 +11,7 @@ class inputTrip(models.Model):
     destination = models.CharField("Chosen Destination", max_length=200)
     start_date = models.DateField("Start Date")
     end_date = models.DateField("End Date")
+    collaborators = models.ManyToManyField(User, blank=True, related_name='collaborative_trips')
 
 
     # ✅ Add these new editable fields:
