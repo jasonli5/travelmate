@@ -11,27 +11,33 @@ class TripsConfig(AppConfig):
     name = 'trips'
 
     def ready(self):
-        logger.debug("AppConfig.ready() called")  # Debug line
+        if os.environ.get('RUN_MAIN'):
+            logger.debug("AppConfig.ready() called")  # Debug line
 
-        if os.environ.get('RUN_MAIN') or not os.environ.get('DJANGO_RUNSERVER'):
-            logger.debug("Initializing scheduler")
+            if os.environ.get('RUN_MAIN') or not os.environ.get('DJANGO_RUNSERVER'):
+                logger.debug("Initializing scheduler")
 
-            try:
-                print("working!")
-                scheduler = BackgroundScheduler()
-                scheduler.add_job(
-                    self.run_daily_reminders,
-                    'cron',
-                    hour=20,
-                    minute=11,
-                    timezone='America/New_York'
-                )
-                scheduler.start()
-                logger.info("Scheduler started successfully")
-                atexit.register(lambda: scheduler.shutdown())
-            except Exception as e:
-                logger.error(f"Failed to start scheduler: {e}")
+                try:
+                    scheduler = BackgroundScheduler()
+                    scheduler.add_job(
+                        self.run_daily_reminders,
+                        'cron',
+                        hour=8,
+                        minute=0,
+                        timezone='America/New_York'
+                    )
+                    scheduler.start()
+                    logger.info("Scheduler started successfully")
+                    atexit.register(lambda: scheduler.shutdown())
+                except Exception as e:
+                    logger.error(f"Failed to start scheduler: {e}")
 
     def run_daily_reminders(self):
-        from .tasks import task_creation  # Import your function
+        from .tasks import task_creation
+        from django_apscheduler.models import DjangoJobExecution
+        from datetime import timedelta
+        from django.utils import timezone
+        # Import your function
         task_creation()  # Execute it
+
+        DjangoJobExecution.objects.delete_old_job_executions(max_age=timedelta(days=7))
