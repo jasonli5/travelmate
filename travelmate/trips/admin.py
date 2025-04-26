@@ -7,6 +7,8 @@ from django.templatetags.static import static
 import json
 import os
 from django.conf import settings
+from trips.tasks import task_creation
+from django.http import HttpResponseRedirect
 
 DEFAULT_TRIPS = {
     'paris': {
@@ -44,7 +46,11 @@ DEFAULT_TRIPS = {
 # Path to JSON file
 TRIPS_FILE = os.path.join(settings.BASE_DIR, 'trips/jsons/predefined_trips.json')
 
-
+@admin.action(description='Send trip reminders')
+def send_reminders(modeladmin, request, queryset):
+    task_creation()
+    modeladmin.message_user(request, "Reminder tasks created successfully", messages.SUCCESS)
+    return HttpResponseRedirect(request.get_full_path())
 def load_predefined_trips():
     """Load trips from JSON file or return default if file doesn't exist"""
     try:
@@ -87,6 +93,7 @@ def save_predefined_trips(trips_data):
 
 @admin.register(inputTrip)
 class TripAdmin(admin.ModelAdmin):
+    actions = [send_reminders]
     # List display configuration
     list_display = ('destination_with_link', 'user', 'weather_preview', 'date_range', 'created_at')
     list_filter = (('start_date', DateFieldListFilter), ('end_date', DateFieldListFilter), 'user')

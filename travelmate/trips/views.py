@@ -33,6 +33,48 @@ from .admin import load_predefined_trips
 
 
 
+from django.shortcuts import get_object_or_404
+from .models import inputTrip
+from .pdf_utils import render_to_pdf
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import io
+
+
+
+PREDEFINED_TRIPS = {
+    'paris': {
+        'destination': 'Paris, France',
+        'activities': 'Visit Eiffel Tower, Try a baguette, Watch a mime, Cruise the Seine',
+        'duration': 7
+    },
+    'tokyo': {
+        'destination': 'Tokyo, Japan',
+        'activities': 'Visit Shibuya Crossing, Try sushi, See cherry blossoms, Explore Akihabara',
+        'duration': 7
+    },
+    'new york city': {
+        'destination': 'New York City, USA',
+        'activities': 'See Times Square, Visit Statue of Liberty, Walk in Central Park, See a Broadway show',
+        'duration': 7
+    },
+    'barcelona': {
+        'destination': 'Barcelona, Spain',
+        'activities': 'Visit Sagrada Familia, Walk Las Ramblas, Try paella, Explore Park Güell',
+        'duration': 7
+    },
+    'maui': {
+        'destination': 'Maui, Hawaii',
+        'activities': 'Road to Hana, Snorkel at Molokini, Watch sunrise at Haleakalā, Attend a luau',
+        'duration': 7
+    },
+    'aspen': {
+        'destination': 'Aspen, Colorado',
+        'activities': 'Skiing/snowboarding, Visit Maroon Bells, Explore downtown Aspen, Relax at hot springs',
+        'duration': 7
+    }
+}
 # Create your views here.
 def trip_draft(request):
     template_data= {}
@@ -332,3 +374,27 @@ def invite_collaborator(request, trip_id):
                 return redirect('edit_trip', trip_id=trip.id)
 
     return redirect('edit_trip', trip_id=trip.id)
+
+@login_required
+def export_trip_pdf(request, trip_id):
+    trip = get_object_or_404(inputTrip, pk=trip_id)
+
+    weather_data = json.loads(trip.weather) if trip.weather else {}
+    activities = Activity.objects.filter(trip=trip).values_list('name', flat=True)
+    all_items = Item.objects.filter(trip=trip)
+    packing_items = all_items.filter(is_ai_suggested=False).order_by("id")
+    considerations = trip.considerations if isinstance(trip.considerations, list) else json.loads(trip.considerations) if trip.considerations else []
+
+    template = get_template('trips/trip_pdf_template.html')
+    html = template.render({
+        'trip': trip,
+        'activities': activities,
+        'packing_items': packing_items,
+        'weather_data': weather_data,
+        'considerations': considerations,
+    })
+
+    response = HttpResponse(content_type='application/pdf')
+    pisa.CreatePDF(io.StringIO(html), dest=response)
+    response['Content-Disposition'] = f'attachment; filename=trip_{trip.id}_summary.pdf'
+    return response

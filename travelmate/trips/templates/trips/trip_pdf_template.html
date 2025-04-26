@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1, h2 { color: #333; }
+    ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Trip Summary</h1>
+
+  <p><strong>Destination:</strong> {{ trip.destination }}</p>
+  <p><strong>Start Date:</strong> {{ trip.start_date }}</p>
+  <p><strong>End Date:</strong> {{ trip.end_date }}</p>
+
+  {% if activities %}
+    <h2>Planned Activities</h2>
+    <ul>
+      {% for activity in activities %}
+        <li>{{ activity }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+    {% if packing_items %}
+  <h2>Packing List</h2>
+    <div class="packing-section">
+      <ul>
+        {% for item in packing_items %}
+          <li>{{ item.name }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if considerations %}
+    <h2>Additional Considerations</h2>
+    <ul>
+      {% for note in considerations %}
+        <li>{{ note }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if weather_data %}
+    <h2>Weather Forecast</h2>
+    <p><strong>Location:</strong> {{ weather_data.location }}</p>
+    <ul>
+      {% for report in weather_data.reports %}
+        <li>
+          <strong>{{ report.date }}</strong><br>
+          {{ report.report|linebreaksbr }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</body>
+</html>
