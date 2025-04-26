@@ -11,6 +11,7 @@ urlpatterns = [
     path('travel_recs/',views.travel_recs, name='travel_recs'),
     path('plan-trip/', views.plan_trip, name='plan_trip'),
     path('my-trips/', views.trips_list, name='trips'),
+    path('shared-trips/', views.shared_trips_list, name='shared_trips'),
     path('trips/delete/<int:trip_id>/', views.delete_trip, name='delete_trip'),
     path('<int:trip_id>/edit/', views.edit_trip, name='edit_trip'),
     path('generate-weather/<int:trip_id>/', views.generate_weather_view, name='generate_weather'),

@@ -121,7 +121,10 @@ def edit_trip(request, trip_id):
                         fail_silently=False,
                     )
 
-            return redirect('trips')
+            if request.user == trip.user:
+                return redirect('trips')  # Owner goes to "My Trips"
+            else:
+                return redirect('shared_trips')  # Collaborator goes to "Shared Trips"
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
@@ -231,7 +234,11 @@ def plan_trip(request):
     return render(request, 'home/index.html', {'destination': destination, 'today': date.today().isoformat()})
 @login_required
 def trips_list(request):
-    trips = (inputTrip.objects.filter(user=request.user) | inputTrip.objects.filter(collaborators=request.user)).distinct()
+    trips = inputTrip.objects.filter(user=request.user)
+    return render(request, 'trips/list.html', {'trips': trips})
+@login_required
+def shared_trips_list(request):
+    trips = inputTrip.objects.filter(collaborators=request.user)
     return render(request, 'trips/list.html', {'trips': trips})
 def delete_trip(request, trip_id):
     if request.method == 'POST':
