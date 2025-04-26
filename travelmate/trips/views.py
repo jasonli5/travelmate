@@ -239,7 +239,7 @@ def trips_list(request):
 @login_required
 def shared_trips_list(request):
     trips = inputTrip.objects.filter(collaborators=request.user)
-    return render(request, 'trips/list.html', {'trips': trips})
+    return render(request, 'trips/shared_trips.html', {'trips': trips})
 def delete_trip(request, trip_id):
     if request.method == 'POST':
         trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
