@@ -374,7 +374,7 @@
                 </div>
 
                 <!-- Collaborators Invite Form  -->
-                {% if request.user == trip.owner %}
+                {% if request.user == trip.user %}
 <div class="collaboration-section my-4 p-3 bg-light rounded">
     <h4 class="coiny-regular text-center">Collaborate on This Trip</h4>
     {% if messages %}
