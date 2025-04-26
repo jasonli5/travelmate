@@ -38,3 +38,12 @@ class travelRecommendations(models.Model):
     def __str__(self):
         return self.name
 
+class TripInvite(models.Model):
+    trip = models.ForeignKey(inputTrip, on_delete=models.CASCADE)
+    email = models.EmailField()
+    invited_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email} invited to {self.trip.destination}"
+
+

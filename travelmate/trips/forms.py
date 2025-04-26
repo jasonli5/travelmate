@@ -22,14 +22,16 @@ class TripForm(forms.ModelForm):
     )
 
 class CollabInviteForm(forms.Form):
-    email = forms.EmailField(label="Invite Collaborator", required=True)
+    email = forms.EmailField(label="Invite Collaborator", required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
     def clean_email(self):
-        email = self.cleaned_data['email']
+        email = self.cleaned_data.get('email')
+        if not email:
+            return email  # it's okay to be blank
         if self.user and email == self.user.email:
             raise forms.ValidationError("You cannot invite yourself!")
         return email
