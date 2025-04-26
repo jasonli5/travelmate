@@ -89,7 +89,7 @@ def trip_draft(request):
 
 @login_required
 def edit_trip(request, trip_id):
-    trip = get_object_or_404(inputTrip, Q(id=trip_id) & (Q(user=request.user) | Q(collaborators=request.user)))
+    trip = get_object_or_404(inputTrip, id = trip_id)
     all_items = Item.objects.filter(trip=trip_id)
     items = all_items.filter(is_ai_suggested=False).order_by("id")
     ai_items = all_items.filter(is_ai_suggested=True).order_by("id")
@@ -231,7 +231,7 @@ def plan_trip(request):
     return render(request, 'home/index.html', {'destination': destination, 'today': date.today().isoformat()})
 @login_required
 def trips_list(request):
-    trips = inputTrip.objects.filter(user=request.user) | inputTrip.objects.filter(collaborators=request.user)
+    trips = (inputTrip.objects.filter(user=request.user) | inputTrip.objects.filter(collaborators=request.user)).distinct()
     return render(request, 'trips/list.html', {'trips': trips})
 def delete_trip(request, trip_id):
     if request.method == 'POST':
@@ -348,9 +348,11 @@ def invite_collaborator(request, trip_id):
                         'end_date': trip.end_date,
                         'inviter': request.user.get_full_name() or request.user.username,
                         'signup_url': request.build_absolute_uri('/accounts/signup'),
+                        'login_url': request.build_absolute_uri('/accounts/login'),
                         'site_name': 'TravelMate',
                         'email': email,
                         'user': request.user,
+                        'user_exists': User.objects.filter(email=email).exists(),
                     }
 
                     subject = render_to_string(
