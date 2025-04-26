@@ -418,3 +418,15 @@ def export_trip_pdf(request, trip_id):
     pisa.CreatePDF(io.StringIO(html), dest=response)
     response['Content-Disposition'] = f'attachment; filename=trip_{trip.id}_summary.pdf'
     return response
+
+
+@login_required
+def remove_collaborator(request, trip_id, user_id):
+    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+    collaborator = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        trip.collaborators.remove(collaborator)
+        messages.success(request, f'Removed {collaborator.get_full_name() or collaborator.username} from trip')
+
+    return redirect('edit_trip', trip_id=trip.id)

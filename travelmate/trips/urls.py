@@ -16,5 +16,6 @@ urlpatterns = [
     path('generate-weather/<int:trip_id>/', views.generate_weather_view, name='generate_weather'),
     path('trips/invite/<int:trip_id>/', views.invite_collaborator, name='invite_collaborator'),
     path('trip/<int:trip_id>/pdf/', export_trip_pdf, name='export_trip_pdf'),
+    path('trips/<int:trip_id>/remove-collaborator/<int:user_id>/', views.remove_collaborator, name='remove_collaborator'),
 ]
 
