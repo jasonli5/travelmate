@@ -7,7 +7,15 @@ from .api_utils import get_ai_suggestions
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
+from django.core.exceptions import PermissionDenied
 
+
+
+def get_trip_and_check_permission(request, trip_id):
+    trip = get_object_or_404(inputTrip, pk=trip_id)
+    if request.user not in trip.collaborators.all() and request.user != trip.user:
+        raise PermissionDenied("You don't have permission to access this trip")
+    return trip
 
 @login_required
 def create_item(request):
@@ -15,7 +23,7 @@ def create_item(request):
         # Handle adding existing AI item
         if "existing_item_id" in request.POST:
             item = get_object_or_404(
-                Item, pk=request.POST["existing_item_id"], user=request.user
+                Item, pk=request.POST["existing_item_id"]
             )
             item.is_ai_suggested = False
             item.save()
@@ -23,13 +31,16 @@ def create_item(request):
 
         # Handle new item creation
         if request.POST.get("name") and request.POST.get("description"):
-            item = Item(
-                name=request.POST["name"],
-                description=request.POST["description"],
-                user=request.user,
-                is_ai_suggested=request.POST.get("is_ai_suggested", False),
-                trip_id=request.POST.get("trip_id")  # New trip association
-            )
+            trip_id = request.POST.get("trip_id")
+            if trip_id:
+                trip = get_object_or_404(inputTrip, pk=trip_id)
+                item = Item(
+                    name=request.POST["name"],
+                    description=request.POST["description"],
+                    user=trip.user,
+                    is_ai_suggested=request.POST.get("is_ai_suggested", False),
+                    trip_id=trip_id
+                )
             item.save()
             return redirect("edit_trip", trip_id=request.POST.get("trip_id"))
 
@@ -38,12 +49,12 @@ def create_item(request):
 
 @login_required
 def edit_item(request, item_id):
-    item = get_object_or_404(Item, id=item_id, user=request.user)
+    item = get_object_or_404(Item, id=item_id)
+    trip = get_trip_and_check_permission(request, item.trip_id)
 
     if request.method == "POST":
         item.name = request.POST.get("name", item.name)
         item.description = request.POST.get("description", item.description)
-        item.trip_id = request.POST.get("trip_id", item.trip_id)  # Update trip
         item.save()
 
         # Redirect back to packing list with trip context
@@ -54,7 +65,9 @@ def edit_item(request, item_id):
 
 @login_required
 def delete_item(request, item_id):
-    item = get_object_or_404(Item, id=item_id, user=request.user)
+    item = get_object_or_404(Item, id=item_id)
+    trip = get_trip_and_check_permission(request, item.trip_id)
+
     trip_id = item.trip_id  # Save trip_id before deletion
 
     if request.method == "POST":

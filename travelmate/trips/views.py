@@ -1,9 +1,18 @@
+import smtplib
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.db.models import Q
 from django.shortcuts import render
 from django.http import JsonResponse
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
-from .models import inputTrip, travelRecommendations
+from django.template.loader import render_to_string
+
+from .models import inputTrip, travelRecommendations, TripInvite
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import inputTrip
 from packinglist.models import Item
@@ -11,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import date, timedelta
 from django.utils import timezone
-from .forms import TripForm
+from .forms import TripForm, CollabInviteForm
 from ai.models import Activity
 from ai.forms import ActivityFormSet
 from ai.api_utils import get_ai_additional_info
@@ -80,7 +89,7 @@ def trip_draft(request):
 
 @login_required
 def edit_trip(request, trip_id):
-    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+    trip = get_object_or_404(inputTrip, id = trip_id)
     all_items = Item.objects.filter(trip=trip_id)
     items = all_items.filter(is_ai_suggested=False).order_by("id")
     ai_items = all_items.filter(is_ai_suggested=True).order_by("id")
@@ -88,6 +97,7 @@ def edit_trip(request, trip_id):
     if request.method == 'POST':
         form = TripForm(request.POST, instance=trip)
         activity_formset = ActivityFormSet(request.POST, instance=trip)
+        collab_form = CollabInviteForm(request.POST, user=request.user)
 
         if form.is_valid() and activity_formset.is_valid():
             # Save the form without committing to database
@@ -99,17 +109,34 @@ def edit_trip(request, trip_id):
             trip.save()
 
             activity_formset.save()
-            return redirect('trips')
+
+            if collab_form.is_valid():
+                email = collab_form.cleaned_data['email']
+                if email:
+                    send_mail(
+                        'Trip Collaboration Invitation',
+                        f'You have been invited to collaborate on the trip to {trip.destination}. Please log in to accept the invitation.',
+                        settings.DEFAULT_FROM_EMAIL,
+                        [email],
+                        fail_silently=False,
+                    )
+
+            if request.user == trip.user:
+                return redirect('trips')  # Owner goes to "My Trips"
+            else:
+                return redirect('shared_trips')  # Collaborator goes to "Shared Trips"
     else:
         form = TripForm(instance=trip)
         activity_formset = ActivityFormSet(instance=trip)
+        collab_form = CollabInviteForm(user=request.user)
 
     return render(request, 'trips/edit_trip.html', {
         'form': form,
         'trip': trip,
         'activity_formset': activity_formset,
         'items': items,
-        "ai_items": ai_items
+        "ai_items": ai_items,
+        'collab_form': collab_form,
     })
 
 def travel_recs(request):
@@ -209,6 +236,10 @@ def plan_trip(request):
 def trips_list(request):
     trips = inputTrip.objects.filter(user=request.user)
     return render(request, 'trips/list.html', {'trips': trips})
+@login_required
+def shared_trips_list(request):
+    trips = inputTrip.objects.filter(collaborators=request.user)
+    return render(request, 'trips/shared_trips.html', {'trips': trips})
 def delete_trip(request, trip_id):
     if request.method == 'POST':
         trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
@@ -217,7 +248,7 @@ def delete_trip(request, trip_id):
     else:
         # If someone tries to access this URL directly via GET, redirect them
         return redirect('trips')
-
+'''
 @login_required
 def edit_trip(request, trip_id):
     trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
@@ -237,7 +268,7 @@ def edit_trip(request, trip_id):
         activity_formset = ActivityFormSet(instance=trip)
 
     return render(request, 'trips/edit_trip.html', {'form': form, 'trip': trip, 'activity_formset': activity_formset, 'items': items, "ai_items" : ai_items})
-
+'''
 
 def generate_trip_weather(trip_id):
     """
@@ -301,6 +332,77 @@ def generate_weather_view(request, trip_id):
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
 @login_required
+def invite_collaborator(request, trip_id):
+    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+
+    if request.method == 'POST':
+        form = CollabInviteForm(request.POST, user=request.user)
+        print(f'Form is valid: {form.is_valid()}')
+
+        if not form.is_valid():
+            print(f"Form errors: {form.errors}")
+
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            print(f'Cleaned Data: {form.cleaned_data}')
+
+            # If the email field is not empty, proceed with the invitation logic
+            if email:
+                try:
+                    context = {
+                        'destination': trip.destination,
+                        'start_date': trip.start_date,
+                        'end_date': trip.end_date,
+                        'inviter': request.user.get_full_name() or request.user.username,
+                        'signup_url': request.build_absolute_uri('/accounts/signup'),
+                        'login_url': request.build_absolute_uri('/accounts/login'),
+                        'site_name': 'TravelMate',
+                        'email': email,
+                        'user': request.user,
+                        'user_exists': User.objects.filter(email=email).exists(),
+                    }
+
+                    subject = render_to_string(
+                        'trips/collabinvite/collab_invite_subject.txt',
+                        context
+                    ).strip()
+
+                    subject = ''.join(subject.splitlines())
+
+                    message = render_to_string(
+                        'trips/collabinvite/collab_invite_email.txt',
+                        context
+                    )
+
+                    email_message = EmailMultiAlternatives(
+                        subject,
+                        message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [email],
+                        headers={'Reply-To': settings.DEFAULT_FROM_EMAIL},
+                    )
+                    email_message.send(fail_silently=False)
+
+                    TripInvite.objects.get_or_create(trip=trip, email=email)
+
+                    messages.success(request, f'Invitation sent to {email}!')
+                except Exception as e:
+                    messages.error(request, 'Failed to send invitation')
+                    if settings.DEBUG:
+                        print(f"Email error: {str(e)}")
+
+            else:
+                # If no email is provided, inform the user
+                messages.info(request, 'No collaborator invited.')
+
+            return redirect('edit_trip', trip_id=trip.id)
+
+        else:
+            messages.error(request, 'There was an error with your invitation form.')
+
+    return redirect('edit_trip', trip_id=trip.id)
+
+@login_required
 def export_trip_pdf(request, trip_id):
     trip = get_object_or_404(inputTrip, pk=trip_id)
 
@@ -323,3 +425,15 @@ def export_trip_pdf(request, trip_id):
     pisa.CreatePDF(io.StringIO(html), dest=response)
     response['Content-Disposition'] = f'attachment; filename=trip_{trip.id}_summary.pdf'
     return response
+
+
+@login_required
+def remove_collaborator(request, trip_id, user_id):
+    trip = get_object_or_404(inputTrip, id=trip_id, user=request.user)
+    collaborator = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        trip.collaborators.remove(collaborator)
+        messages.success(request, f'Removed {collaborator.get_full_name() or collaborator.username} from trip')
+
+    return redirect('edit_trip', trip_id=trip.id)

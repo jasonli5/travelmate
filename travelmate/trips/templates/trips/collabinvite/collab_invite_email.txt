@@ -1,0 +1,14 @@
+{% load i18n %}
+Hello!
+
+{{ inviter }} has invited you to collaborate on their trip to {{ destination }}
+from {{ start_date }} to {{ end_date }}.
+
+{% if user_exists %}
+Login here to view the trip: {{ login_url }}
+{% else %}
+Sign up here to accept: {{ signup_url }}
+{% endif %}
+
+Thanks,
+The {{ site_name }} Team
