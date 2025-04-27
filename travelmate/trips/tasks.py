@@ -11,7 +11,7 @@ def get_recipients():
     trips = inputTrip.objects.all()
     recipients = []
     for trip in trips:
-        if trip.notified is False and timezone.now().date() <= trip.start_date - timedelta(5):
+        if trip.notified is False and trip.start_date - timedelta(5) <= timezone.now().date() and timezone.now().date() < trip.start_date:
             recipients.append((trip.user, trip))
     return recipients
 
@@ -41,6 +41,7 @@ def task_creation():
         })
         notify_user(user.id, msg)
         trip.notified = True
+        trip.save()
     print(f"Created {len(remind_users)} tasks")
 
 

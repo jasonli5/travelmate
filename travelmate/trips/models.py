@@ -22,7 +22,7 @@ class inputTrip(models.Model):
     considerations = models.JSONField("Additional Considerations", blank=True, null=True)
 
     #notified boolean helps with logic for reminder emails
-    notified = False
+    notified = models.BooleanField("User has been notified", default = False)
 
     def __str__(self):
         return f"{self.destination}: [{self.user}] - ({self.start_date} to {self.end_date}) - #{self.id}"
