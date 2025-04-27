@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "ai",
     "background_task",
     'django_apscheduler',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -165,9 +166,21 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'travelmate.user.management@gmail.com'
 EMAIL_HOST_PASSWORD = 'cogi bxzw ixsz izhm'
 
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Only use this in production
+if not DEBUG:
+    # AWS S3 settings
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 #Settings for reminder email background tasks
 BACKGROUND_TASK_RUN_ASYNC = False
