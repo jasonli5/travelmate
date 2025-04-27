@@ -12,7 +12,6 @@ class inputTrip(models.Model):
     start_date = models.DateField("Start Date")
     end_date = models.DateField("End Date")
 
-
     # ✅ Add these new editable fields:
     weather = models.TextField("Weather Info", blank=True, null=True)
     packing_list = models.TextField("Packing List", blank=True, null=True)
@@ -20,6 +19,9 @@ class inputTrip(models.Model):
     activities_list = models.TextField("Activities List", blank=True, null=True)
 
     considerations = models.JSONField("Additional Considerations", blank=True, null=True)
+
+    #notified boolean helps with logic for reminder emails
+    notified = False
 
     def __str__(self):
         return f"{self.destination}: [{self.user}] - ({self.start_date} to {self.end_date}) - #{self.id}"

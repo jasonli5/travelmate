@@ -10,9 +10,8 @@ from django.template.loader import render_to_string
 def get_recipients():
     trips = inputTrip.objects.all()
     recipients = []
-
     for trip in trips:
-        if trip.created_at <= timezone.now() - timedelta(3) and trip.end_date > timezone.now().date():
+        if trip.notified is False and timezone.now().date() <= trip.start_date - timedelta(5):
             recipients.append((trip.user, trip))
     return recipients
 
@@ -41,6 +40,7 @@ def task_creation():
             'trip_id': trip.id
         })
         notify_user(user.id, msg)
+        trip.notified = True
     print(f"Created {len(remind_users)} tasks")
 
 
