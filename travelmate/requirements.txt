@@ -14,6 +14,7 @@ cryptography==44.0.2
 cssselect2==0.8.0
 defusedxml==0.7.1
 distro==1.9.0
+dj-database-url==2.3.0
 Django==5.2
 django-apscheduler==0.7.0
 django-background-tasks==1.2.8
@@ -32,6 +33,7 @@ packaging==24.2
 pathspec==0.12.1
 pillow==11.2.1
 platformdirs==4.3.7
+psycopg2-binary==2.9.10
 pycparser==2.22
 pydantic==2.11.3
 pydantic_core==2.33.1
