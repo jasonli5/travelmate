@@ -14,6 +14,8 @@ from whitenoise import WhiteNoise
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "travelmate.settings")
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 application = get_wsgi_application()
 application = WhiteNoise(application, root=os.path.join(os.path.dirname(__file__), 'staticfiles'))
-application.add_files(os.path.join(os.path.dirname(__file__), 'media'), prefix='media/')
+application.add_files(os.path.join(BASE_DIR, 'media'), prefix='media/')
