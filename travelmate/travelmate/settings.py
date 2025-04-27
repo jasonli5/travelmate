@@ -30,8 +30,13 @@ SECRET_KEY = 'django-insecure-1(h+_z9ab=5psbjmd-b9mov*q-@&+7l#za=q38l3qa7+7x+#@b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['travelmate.up.railway.app', 'www.travelmate.up.railway.app']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://travelmate.up.railway.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 # Application definition
 
