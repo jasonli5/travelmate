@@ -108,7 +108,7 @@ class TripAdmin(admin.ModelAdmin):
             'fields': ('user', 'destination', 'considerations', ('start_date', 'end_date'))
         }),
         ('Weather Data', {
-            'fields': ('weather_prettified',),
+            'fields': ('weather','weather_prettified'),
             'classes': ('collapse',),  # Makes this section collapsible
         }),
     )
@@ -138,23 +138,18 @@ class TripAdmin(admin.ModelAdmin):
         return "No weather data"
     weather_preview.short_description = 'Weather'
 
-    def weather_prettified(self, obj):
-        if obj.weather:
-            try:
-                weather_data = json.loads(obj.weather)
-                pretty_weather = json.dumps(weather_data, indent=2)
-                return format_html('<pre>{}</pre>', pretty_weather)
-            except json.JSONDecodeError:
-                return "Invalid weather data format"
-        return "No weather data available"
-    weather_prettified.short_description = 'Weather Data'
-
     # Customize the add/edit form
     def get_readonly_fields(self, request, obj=None):
-        if obj:  # Editing an existing object
-            return ('created_at', 'weather_prettified')
-        return ()
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if obj:  # Only for existing objects
+            return readonly_fields + ('weather_prettified',)
+        return readonly_fields
 
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if obj:  # Only for existing objects
+            return fields + ('weather_prettified',)
+        return fields
     def weather_prettified(self, obj):
         if not obj.weather:
             return "No weather data available"

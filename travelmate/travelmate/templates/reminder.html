@@ -2,11 +2,11 @@
 
 Hello, User {{ user.username }}
 
-According to our records, your trip to {{trip.destination}} that is more than 3 days old.
+According to our records, your trip to {{trip.destination}} is coming up fast!
 
 If you still want to go on this trip, we urge you to log in and continue planning at this link:
 
-http://127.0.0.1:8000{% url 'edit_trip' trip_id=trip.id %}
+{{site}}{% url 'edit_trip' trip_id=trip.id %}
 
 If you are done planning the trip, please disregard this email and enjoy your travels.
 

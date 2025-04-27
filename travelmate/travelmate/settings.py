@@ -58,7 +58,9 @@ INSTALLED_APPS = [
     "background_task",
     'django_apscheduler',
     'storages'
+    'django.contrib.sites',
 ]
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

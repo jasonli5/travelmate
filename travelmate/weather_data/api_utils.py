@@ -352,7 +352,7 @@ def get_date_range_weather(lat, lon, location_name, start_date, end_date):
         forecast_data = response.json()
 
         for day in forecast_data['daily']:
-            day_date = datetime.fromtimestamp(day['dt'])
+            day_date = datetime.fromtimestamp(day['dt']).replace(hour=0, minute=0, second=0, microsecond=0)
             if start_date <= day_date <= end_date:
                 results.append(format_weather_output(day, location_name))
 

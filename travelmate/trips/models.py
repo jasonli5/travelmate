@@ -13,7 +13,6 @@ class inputTrip(models.Model):
     end_date = models.DateField("End Date")
     collaborators = models.ManyToManyField(User, blank=True, related_name='collaborative_trips')
 
-
     # ✅ Add these new editable fields:
     weather = models.TextField("Weather Info", blank=True, null=True)
     packing_list = models.TextField("Packing List", blank=True, null=True)
@@ -21,6 +20,9 @@ class inputTrip(models.Model):
     activities_list = models.TextField("Activities List", blank=True, null=True)
 
     considerations = models.JSONField("Additional Considerations", blank=True, null=True)
+
+    #notified boolean helps with logic for reminder emails
+    notified = models.BooleanField("User has been notified", default = False)
 
     def __str__(self):
         return f"{self.destination}: [{self.user}] - ({self.start_date} to {self.end_date}) - #{self.id}"

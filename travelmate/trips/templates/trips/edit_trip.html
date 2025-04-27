@@ -18,7 +18,8 @@
                             <!-- Basic Trip Info -->
                             <div class="mb-3">
                                 <label for="id_destination" class="form-label">Chosen Destination</label>
-                                {{ form.destination|add_class:"form-control" }}
+                                <input type="text" class="form-control" value="{{ trip.destination }}" readonly>
+                                {{ form.destination.as_hidden }}
                             </div>
                             <div class="mb-3">
                                 <label for="id_start_date" class="form-label">Start Date</label>
