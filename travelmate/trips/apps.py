@@ -32,6 +32,8 @@ class TripsConfig(AppConfig):
                 except Exception as e:
                     logger.error(f"Failed to start scheduler: {e}")
 
+        from . import signals
+
     def run_daily_reminders(self):
         from .tasks import task_creation
         from django_apscheduler.models import DjangoJobExecution

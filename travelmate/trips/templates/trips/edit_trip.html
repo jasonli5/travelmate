@@ -358,22 +358,91 @@
                                 </div>
                             </div>
 
-                            <!-- Submit -->
-                            <div class="d-flex justify-content-center gap-2">
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                                <a href="{% url 'trips' %}" class="btn btn-secondary">Cancel</a>
-                            </div>
+<!-- Submit -->
+<div class="d-flex justify-content-center gap-2">
+    {% if request.user == trip.user %}
+        <!-- Owner: Save goes back to "My Trips" -->
+        <button type="submit" name="save" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'trips' %}" class="btn btn-secondary">Cancel</a>
+    {% else %}
+        <!-- Collaborator: Save goes back to "Shared Trips" -->
+        <button type="submit" name="save" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'shared_trips' %}" class="btn btn-secondary">Cancel</a>
+    {% endif %}
+</div>
                         </form>
                     </div>
                 </div>
             </div>
             <!-- Right Column - Packing List (Embedded from your existing page) -->
-            <div class="col-lg-6">
-                <div class="card shadow-sm" style="min-height: 800px;">
-                {% include 'packinglist/packing_list.html' with trip=trip items=items %}
+<div class="col-lg-6">
+    <div class="card shadow-sm" style="min-height: 800px;">
+        {% include 'packinglist/packing_list.html' with trip=trip items=items %}
+    </div>
+
+    <!-- Collaborators Section -->
+    <div class="collaboration-section my-4 p-3 bg-light rounded">
+        <!-- Invite Form (only shown to trip owner) -->
+        {% if request.user == trip.user %}
+            <h4 class="coiny-regular text-center">Collaborate on This Trip</h4>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form method="POST" action="{% url 'invite_collaborator' trip.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ collab_form.email.label_tag }}
+                    {{ collab_form.email|add_class:"form-control" }}
+                    {% if collab_form.email.errors %}
+                        <div class="text-danger">{{ collab_form.email.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary mt-3">Send Invitation</button>
+                </div>
+            </form>
+            <hr class="my-4">
+        {% endif %}
+
+        <!-- Current Collaborators (visible to all collaborators) -->
+        <h5 class="coiny-regular text-center">Current Collaborators</h5>
+        <div class="list-group mt-3">
+            <!-- Show trip owner first -->
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-crown text-warning me-2"></i>
+                    {{ trip.user.get_full_name|default:trip.user.username }}
+                    <span class="text-muted small ms-2">(Owner)</span>
                 </div>
             </div>
+
+            <!-- Show other collaborators -->
+            {% for collaborator in trip.collaborators.all %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-user me-2"></i>
+                        {{ collaborator.get_full_name|default:collaborator.username }}
+                    </div>
+                    {% if request.user == trip.user %}
+                        <form method="POST" action="{% url 'remove_collaborator' trip.id collaborator.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Remove {{ collaborator.get_full_name|default:collaborator.username }} from this trip?')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="list-group-item text-muted text-center">
+                    No additional collaborators yet
+                </div>
+            {% endfor %}
         </div>
+    </div>
+</div>
     </div>
 </div>
 <script>

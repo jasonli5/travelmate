@@ -11,6 +11,7 @@ class inputTrip(models.Model):
     destination = models.CharField("Chosen Destination", max_length=200)
     start_date = models.DateField("Start Date")
     end_date = models.DateField("End Date")
+    collaborators = models.ManyToManyField(User, blank=True, related_name='collaborative_trips')
 
     # ✅ Add these new editable fields:
     weather = models.TextField("Weather Info", blank=True, null=True)
@@ -38,4 +39,13 @@ class travelRecommendations(models.Model):
     image = models.ImageField(upload_to='travel_recs/')
     def __str__(self):
         return self.name
+
+class TripInvite(models.Model):
+    trip = models.ForeignKey(inputTrip, on_delete=models.CASCADE)
+    email = models.EmailField()
+    invited_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email} invited to {self.trip.destination}"
+
 
