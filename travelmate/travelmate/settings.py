@@ -57,8 +57,8 @@ INSTALLED_APPS = [
     "ai",
     "background_task",
     'django_apscheduler',
-    'storages'
     'django.contrib.sites',
+    'storages'
 ]
 SITE_ID = 1
 
