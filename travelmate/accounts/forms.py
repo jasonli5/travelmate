@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import PasswordChangeForm
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(
@@ -106,23 +107,15 @@ class CustomUserChangeForm(UserChangeForm):
             }
         ),
     )
-    password = forms.CharField(
-        max_length=50,
-        required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Password",
-                "class": "form-control",
-                "data-toggle": "password",
-                "id": "password",
-            }
-        ),
-    )
+
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
+        print(email)
+        print(self.instance.email)
+        if User.objects.filter(email=email).exists() and email != self.instance.email:
             raise ValidationError("This email address is already in use. Please use a different email")
         return email
+
     class Meta:
         model = User
         fields = ['email','username','password']
