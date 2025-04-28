@@ -107,22 +107,25 @@ class CustomUserChangeForm(UserChangeForm):
         ),
     )
     password = forms.CharField(
-        max_length=50,
+        max_length=100,
         required=True,
-        widget=forms.PasswordInput(
+        widget=forms.TextInput(
             attrs={
                 "placeholder": "Password",
                 "class": "form-control",
-                "data-toggle": "password",
-                "id": "password",
             }
-        ),
+        ), help_text=("Raw passwords are not stored, so there is no way to see "
+                    "this user's password, but you can change the password "
+                    "using <a href=\"password/\">this form</a>.")
     )
+    
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
+        #username = self.cleaned_data['username']
+        if User.objects.filter(email=email).exclude(self.c).exists(): 
             raise ValidationError("This email address is already in use. Please use a different email")
         return email
+
     class Meta:
         model = User
         fields = ['email','username','password']
